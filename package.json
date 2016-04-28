@@ -121,6 +121,6 @@
     "test-cli": "bash test/cli.sh",
     "test-coverage": "istanbul cover _mocha -- -- test/index.js",
     "test-travis": "npm run build-md && npm run build-bundle && npm run lint && npm run test-coverage && npm run test-cli",
-    "test": "npm run build && npm run lint && npm run test-coverage && npm run test-cli"
+    "test": "npm run build && npm run test-coverage && npm run test-cli"
   }
 }
