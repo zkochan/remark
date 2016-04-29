@@ -15,7 +15,7 @@
  * Dependencies.
  */
 
-var unified = require('unified');
+var unified = require('../unified');
 var Parser = require('./lib/parse');
 var Compiler = require('./lib/stringify.js');
 var escape = require('./lib/escape.json');

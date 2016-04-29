@@ -36,6 +36,7 @@
     "npm-prefix": "^1.0.1",
     "parse-entities": "^1.0.0",
     "repeat-string": "^1.5.0",
+    "run-async": "^2.2.0",
     "stringify-entities": "^1.0.0",
     "to-vfile": "^1.0.0",
     "trim": "^0.0.1",

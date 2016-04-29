@@ -67,8 +67,12 @@ function empty() {
  */
 
 describe('remark.parse(file, options?)', function () {
-    it('should accept a `string`', function () {
-        assert(remark.parse('Alfred').children.length === 1);
+    it('should accept a `string`', done => {
+        return remark.parse('Alfred')
+          .then(node => {
+            assert(node.children.length === 1)
+            done()
+          })
     });
 
     it('should throw when `options` is not an object', function () {
@@ -109,13 +113,13 @@ describe('remark.parse(file, options?)', function () {
         }, /options.breaks/);
     });
 
-    it('should throw when `options.pedantic` is not a boolean', function () {
-        assert.throws(function () {
-            remark.parse('', {
-                'pedantic': {}
-            });
-        }, /options.pedantic/);
-    });
+    it('should throw when `options.pedantic` is not a boolean', () => {
+      assert.throws(() => {
+        remark.parse('', {
+          pedantic: {}
+        })
+      }, /options.pedantic/)
+    })
 
     it('should throw when `options.yaml` is not a boolean', function () {
         assert.throws(function () {
@@ -125,142 +129,142 @@ describe('remark.parse(file, options?)', function () {
         }, /options.yaml/);
     });
 
-    it('should throw parse errors', function () {
-        var processor = remark();
-        var message = 'Found it!';
-        var hasThrown;
+    it('should throw parse errors', done => {
+      var processor = remark()
+      var message = 'Found it!'
 
-        /**
-         * Tokenizer.
-         *
-         * @param {Function} eat - Eater.
-         * @param {string} value - Rest of content.
-         */
-        function emphasis(eat, value) {
-            if (value.charAt(0) === '*') {
-                eat.file.fail(message, eat.now());
-            }
+      /**
+       * Tokenizer.
+       *
+       * @param {Function} eat - Eater.
+       * @param {string} value - Rest of content.
+       */
+      function emphasis (eat, value) {
+        if (value.charAt(0) === '*') {
+          eat.file.fail(message, eat.now())
         }
+      }
 
-        /**
-         * Locator.
-         *
-         * @param {string} value - Value to search.
-         * @param {number} fromIndex - Index to start searching at.
-         * @return {number} - Location of possible auto-link.
-         */
-        function locator(value, fromIndex) {
-            return value.indexOf('*', fromIndex);
-        }
+      /**
+       * Locator.
+       *
+       * @param {string} value - Value to search.
+       * @param {number} fromIndex - Index to start searching at.
+       * @return {number} - Location of possible auto-link.
+       */
+      function locator (value, fromIndex) {
+        return value.indexOf('*', fromIndex)
+      }
 
-        emphasis.locator = locator;
-        processor.Parser.prototype.inlineTokenizers.emphasis = emphasis;
+      emphasis.locator = locator
+      processor.Parser.prototype.inlineTokenizers.emphasis = emphasis
 
-        try {
-            processor.parse('Hello *World*!');
-        } catch (exception) {
-            hasThrown = true;
+      processor.parse('Hello *World*!')
+        .catch(exception => {
+          assert(exception.file === '')
+          assert(exception.line === 1)
+          assert(exception.column === 7)
+          assert(exception.reason === message)
+          assert(exception.toString() === '1:7: ' + message)
+          done()
+        })
+    })
 
-            assert(exception.file === '');
-            assert(exception.line === 1);
-            assert(exception.column === 7);
-            assert(exception.reason === message);
-            assert(exception.toString() === '1:7: ' + message);
-        }
+    it('should warn when missing locators', function (done) {
+      var processor = remark()
+      var proto = processor.Parser.prototype
+      var methods = proto.inlineMethods
+      var file = new VFile('Hello *World*!')
 
-        assert(hasThrown === true);
-    });
+      /** Tokenizer. */
+      function noop () {}
 
-    it('should warn when missing locators', function () {
-        var processor = remark();
-        var proto = processor.Parser.prototype;
-        var methods = proto.inlineMethods;
-        var file = new VFile('Hello *World*!');
+      proto.inlineTokenizers.foo = noop
+      methods.splice(methods.indexOf('inlineText'), 0, 'foo')
 
-        /** Tokenizer. */
-        function noop() {}
-
-        proto.inlineTokenizers.foo = noop;
-        methods.splice(methods.indexOf('inlineText'), 0, 'foo');
-
-        file.quiet = true;
-        processor.parse(file);
-
-        assert.equal(String(file.messages[0]), '1:1: Missing locator: `foo`');
-    });
+      file.quiet = true
+      return processor.parse(file)
+        .then(() => {
+          assert.equal(String(file.messages[0]), '1:1: Missing locator: `foo`')
+          done()
+        })
+    })
 
     it('should warn with entity messages', function () {
-        var filePath = path.join('test', 'input', 'entities-advanced.text');
-        var doc = fs.readFileSync(filePath, 'utf8');
-        var file = new VFile(doc);
-        var notTerminated = 'Named character references must be ' +
-            'terminated by a semicolon';
+      var filePath = path.join('test', 'input', 'entities-advanced.text')
+      var doc = fs.readFileSync(filePath, 'utf8')
+      var file = new VFile(doc)
+      var notTerminated = 'Named character references must be ' +
+          'terminated by a semicolon'
 
-        file.quiet = true;
+      file.quiet = true
 
-        remark.process(file);
+      remark.process(file)
 
-        assert.deepEqual(file.messages.map(String), [
-          '1:13: Named character references must be known',
-          '5:15: ' + notTerminated,
-          '10:14: ' + notTerminated,
-          '12:38: ' + notTerminated,
-          '15:16: ' + notTerminated,
-          '15:37: ' + notTerminated,
-          '14:16: ' + notTerminated,
-          '18:17: ' + notTerminated,
-          '19:21: ' + notTerminated,
-          '17:16: ' + notTerminated,
-          '24:16: ' + notTerminated,
-          '24:37: ' + notTerminated,
-          '22:11: ' + notTerminated,
-          '29:17: ' + notTerminated,
-          '30:21: ' + notTerminated,
-          '28:17: ' + notTerminated,
-          '33:11: ' + notTerminated,
-          '36:27: ' + notTerminated,
-          '37:10: ' + notTerminated,
-          '41:25: ' + notTerminated,
-          '42:10: ' + notTerminated
-        ]);
-    });
+      assert.deepEqual(file.messages.map(String), [
+        '1:13: Named character references must be known',
+        '5:15: ' + notTerminated,
+        '10:14: ' + notTerminated,
+        '12:38: ' + notTerminated,
+        '15:16: ' + notTerminated,
+        '15:37: ' + notTerminated,
+        '14:16: ' + notTerminated,
+        '18:17: ' + notTerminated,
+        '19:21: ' + notTerminated,
+        '17:16: ' + notTerminated,
+        '24:16: ' + notTerminated,
+        '24:37: ' + notTerminated,
+        '22:11: ' + notTerminated,
+        '29:17: ' + notTerminated,
+        '30:21: ' + notTerminated,
+        '28:17: ' + notTerminated,
+        '33:11: ' + notTerminated,
+        '36:27: ' + notTerminated,
+        '37:10: ' + notTerminated,
+        '41:25: ' + notTerminated,
+        '42:10: ' + notTerminated
+      ])
+    })
 
-    it('should be able to set options', function () {
-        var processor = remark();
-        var html = processor.Parser.prototype.blockTokenizers.html;
-        var result;
+    it('should be able to set options', done => {
+      var processor = remark()
+      var html = processor.Parser.prototype.blockTokenizers.html
+      var result
 
-        /**
-         * Set option when an HMTL comment occurs:
-         * `<!-- $key -->`, turns on `$key`.
-         *
-         * @param {function(string)} eat - Eater.
-         * @param {string} value - Rest of content.
-         */
-        function replacement(eat, value) {
-            var node = /<!--\s*(.*?)\s*-->/g.exec(value);
-            var options = {};
+      /**
+       * Set option when an HMTL comment occurs:
+       * `<!-- $key -->`, turns on `$key`.
+       *
+       * @param {function(string)} eat - Eater.
+       * @param {string} value - Rest of content.
+       */
+      function replacement (eat, value) {
+        var node = /<!--\s*(.*?)\s*-->/g.exec(value)
+        var options = {}
 
-            if (node) {
-                options[node[1]] = true;
+        if (node) {
+          options[node[1]] = true
 
-                this.setOptions(options);
-            }
-
-            return html.apply(this, arguments);
+          this.setOptions(options)
         }
 
-        processor.Parser.prototype.blockTokenizers.html = replacement;
+        return html.apply(this, arguments)
+      }
 
-        result = processor.parse([
-            '<!-- commonmark -->',
-            '',
-            '1)   Hello World',
-            ''
-        ].join('\n'));
+      processor.Parser.prototype.blockTokenizers.html = replacement
 
-        assert(result.children[1].type === 'list');
-    });
+      processor
+        .parse([
+          '<!-- commonmark -->',
+          '',
+          '1)   Hello World',
+          ''
+        ].join('\n'))
+        .then(result => {
+          assert(result.children[1].type === 'list')
+          done()
+        })
+    })
 });
 
 describe('remark.stringify(ast, file, options?)', function () {
@@ -748,22 +752,21 @@ describe('remark.process(value, options, done)', function () {
     );
 });
 
-describe('function attacher(remark, options)', function () {
+describe.only('function attacher(remark, options)', function () {
     /*
      * Lot's of other tests are in
      * `remark.use(plugin, options)`.
      */
 
     it('should be able to modify `Parser` without affecting other instances',
-        function () {
+        done => {
             var doc = 'Hello w/ a @mention!\n';
 
-            assert(
-                remark.use(mentions).process(doc) ===
-                'Hello w/ a [@mention](https://github.com/blog/821)!\n'
-            );
-
-            assert(remark.process(doc) === doc);
+            return remark.use(mentions).process(doc)
+              .then(res => assert(res.result === 'Hello w/ a [@mention](https://github.com/blog/821)!\n'))
+              .then(() => remark.process(doc))
+              .then(res => assert(res.result === doc))
+              .then(() => done())
         }
     );
 });
