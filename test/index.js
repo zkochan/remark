@@ -1,16 +1,17 @@
-'use strict';
+'use strict'
 
 /* eslint-env node, mocha */
 
-var path = require('path');
-var fs = require('fs');
-var assert = require('assert');
-var VFile = require('vfile');
-var extend = require('extend');
-var remark = require('..');
-var fixtures = require('./fixtures.js');
-var badges = require('./badges.js');
-var mentions = require('./mentions.js');
+var path = require('path')
+var fs = require('fs')
+var assert = require('assert')
+var VFile = require('vfile')
+var extend = require('extend')
+var remark = require('..')
+var fixtures = require('./fixtures.js')
+var badges = require('./badges.js')
+var mentions = require('./mentions.js')
+var expect = require('chai').expect
 
 /*
  * Settings.
@@ -19,15 +20,15 @@ var mentions = require('./mentions.js');
 /**
  * No-operation.
  */
-function noop() {}
+function noop () {}
 
 /**
  * No-operation plugin.
  *
  * @return {Function} - `noop`.
  */
-function plugin() {
-    return noop;
+function plugin () {
+  return noop
 }
 
 /**
@@ -37,8 +38,8 @@ function plugin() {
  * @param {VFile} file - Virtual file.
  * @param {Function} next - Callback invoked when done.
  */
-function asyncTransformer(node, file, next) {
-    setTimeout(next, 4);
+function asyncTransformer (node, file, next) {
+  setTimeout(next, 4)
 }
 
 /**
@@ -46,8 +47,8 @@ function asyncTransformer(node, file, next) {
  *
  * @return {Function} - `asyncTransformer`.
  */
-function asyncAttacher() {
-    return asyncTransformer;
+function asyncAttacher () {
+  return asyncTransformer
 }
 
 /**
@@ -55,11 +56,11 @@ function asyncAttacher() {
  *
  * @return {Node} - Empty `root` node.
  */
-function empty() {
-    return {
-        'type': 'root',
-        'children': []
-    };
+function empty () {
+  return {
+    type: 'root',
+    children: []
+  }
 }
 
 /*
@@ -67,205 +68,204 @@ function empty() {
  */
 
 describe('remark.parse(file, options?)', function () {
-    it('should accept a `string`', done => {
-        return remark.parse('Alfred')
-          .then(node => {
-            assert(node.children.length === 1)
-            done()
-          })
-    });
-
-    it('should throw when `options` is not an object', function () {
-        assert.throws(function () {
-            remark.parse('', false);
-        }, /options/);
-    });
-
-    it('should throw when `options.position` is not a boolean', function () {
-        assert.throws(function () {
-            remark.parse('', {
-                'position': 0
-            });
-        }, /options.position/);
-    });
-
-    it('should throw when `options.gfm` is not a boolean', function () {
-        assert.throws(function () {
-            remark.parse('', {
-                'gfm': Infinity
-            });
-        }, /options.gfm/);
-    });
-
-    it('should throw when `options.footnotes` is not a boolean', function () {
-        assert.throws(function () {
-            remark.parse('', {
-                'footnotes': 1
-            });
-        }, /options.footnotes/);
-    });
-
-    it('should throw when `options.breaks` is not a boolean', function () {
-        assert.throws(function () {
-            remark.parse('', {
-                'breaks': 'unicorn'
-            });
-        }, /options.breaks/);
-    });
-
-    it('should throw when `options.pedantic` is not a boolean', () => {
-      assert.throws(() => {
-        remark.parse('', {
-          pedantic: {}
-        })
-      }, /options.pedantic/)
-    })
-
-    it('should throw when `options.yaml` is not a boolean', function () {
-        assert.throws(function () {
-            remark.parse('', {
-                'yaml': [true]
-            });
-        }, /options.yaml/);
-    });
-
-    it('should throw parse errors', done => {
-      var processor = remark()
-      var message = 'Found it!'
-
-      /**
-       * Tokenizer.
-       *
-       * @param {Function} eat - Eater.
-       * @param {string} value - Rest of content.
-       */
-      function emphasis (eat, value) {
-        if (value.charAt(0) === '*') {
-          eat.file.fail(message, eat.now())
-        }
-      }
-
-      /**
-       * Locator.
-       *
-       * @param {string} value - Value to search.
-       * @param {number} fromIndex - Index to start searching at.
-       * @return {number} - Location of possible auto-link.
-       */
-      function locator (value, fromIndex) {
-        return value.indexOf('*', fromIndex)
-      }
-
-      emphasis.locator = locator
-      processor.Parser.prototype.inlineTokenizers.emphasis = emphasis
-
-      processor.parse('Hello *World*!')
-        .catch(exception => {
-          assert(exception.file === '')
-          assert(exception.line === 1)
-          assert(exception.column === 7)
-          assert(exception.reason === message)
-          assert(exception.toString() === '1:7: ' + message)
+  it('should accept a `string`', done => {
+      return remark.parse('Alfred')
+        .then(node => {
+          assert(node.children.length === 1)
           done()
         })
-    })
+  })
 
-    it('should warn when missing locators', function (done) {
-      var processor = remark()
-      var proto = processor.Parser.prototype
-      var methods = proto.inlineMethods
-      var file = new VFile('Hello *World*!')
+  it('should throw when `options` is not an object', function () {
+    assert.throws(function () {
+      remark.parse('', false)
+    }, /options/)
+  })
 
-      /** Tokenizer. */
-      function noop () {}
+  it('should throw when `options.position` is not a boolean', function () {
+    assert.throws(function () {
+      remark.parse('', {
+        position: 0
+      })
+    }, /options.position/)
+  })
 
-      proto.inlineTokenizers.foo = noop
-      methods.splice(methods.indexOf('inlineText'), 0, 'foo')
+  it('should throw when `options.gfm` is not a boolean', function () {
+    assert.throws(function () {
+      remark.parse('', {
+        gfm: Infinity
+      })
+    }, /options.gfm/)
+  })
 
-      file.quiet = true
-      return processor.parse(file)
-        .then(() => {
-          assert.equal(String(file.messages[0]), '1:1: Missing locator: `foo`')
-          done()
-        })
-    })
+  it('should throw when `options.footnotes` is not a boolean', function () {
+    assert.throws(function () {
+      remark.parse('', {
+        footnotes: 1
+      })
+    }, /options.footnotes/)
+  })
 
-    it('should warn with entity messages', function () {
-      var filePath = path.join('test', 'input', 'entities-advanced.text')
-      var doc = fs.readFileSync(filePath, 'utf8')
-      var file = new VFile(doc)
-      var notTerminated = 'Named character references must be ' +
-          'terminated by a semicolon'
+  it('should throw when `options.breaks` is not a boolean', function () {
+    assert.throws(function () {
+      remark.parse('', {
+        breaks: 'unicorn'
+      })
+    }, /options.breaks/)
+  })
 
-      file.quiet = true
+  it('should throw when `options.pedantic` is not a boolean', () => {
+    assert.throws(() => {
+      remark.parse('', {
+        pedantic: {}
+      })
+    }, /options.pedantic/)
+  })
 
-      remark.process(file)
+  it('should throw when `options.yaml` is not a boolean', function () {
+    assert.throws(function () {
+      remark.parse('', {
+        yaml: [true]
+      })
+    }, /options.yaml/)
+  })
 
-      assert.deepEqual(file.messages.map(String), [
-        '1:13: Named character references must be known',
-        '5:15: ' + notTerminated,
-        '10:14: ' + notTerminated,
-        '12:38: ' + notTerminated,
-        '15:16: ' + notTerminated,
-        '15:37: ' + notTerminated,
-        '14:16: ' + notTerminated,
-        '18:17: ' + notTerminated,
-        '19:21: ' + notTerminated,
-        '17:16: ' + notTerminated,
-        '24:16: ' + notTerminated,
-        '24:37: ' + notTerminated,
-        '22:11: ' + notTerminated,
-        '29:17: ' + notTerminated,
-        '30:21: ' + notTerminated,
-        '28:17: ' + notTerminated,
-        '33:11: ' + notTerminated,
-        '36:27: ' + notTerminated,
-        '37:10: ' + notTerminated,
-        '41:25: ' + notTerminated,
-        '42:10: ' + notTerminated
-      ])
-    })
+  it('should throw parse errors', done => {
+    var processor = remark()
+    var message = 'Found it!'
 
-    it('should be able to set options', done => {
-      var processor = remark()
-      var html = processor.Parser.prototype.blockTokenizers.html
-      var result
+    /**
+     * Tokenizer.
+     *
+     * @param {Function} eat - Eater.
+     * @param {string} value - Rest of content.
+     */
+    function emphasis (eat, value) {
+      if (value.charAt(0) === '*') {
+        eat.file.fail(message, eat.now())
+      }
+    }
 
-      /**
-       * Set option when an HMTL comment occurs:
-       * `<!-- $key -->`, turns on `$key`.
-       *
-       * @param {function(string)} eat - Eater.
-       * @param {string} value - Rest of content.
-       */
-      function replacement (eat, value) {
-        var node = /<!--\s*(.*?)\s*-->/g.exec(value)
-        var options = {}
+    /**
+     * Locator.
+     *
+     * @param {string} value - Value to search.
+     * @param {number} fromIndex - Index to start searching at.
+     * @return {number} - Location of possible auto-link.
+     */
+    function locator (value, fromIndex) {
+      return value.indexOf('*', fromIndex)
+    }
 
-        if (node) {
-          options[node[1]] = true
+    emphasis.locator = locator
+    processor.Parser.prototype.inlineTokenizers.emphasis = emphasis
 
-          this.setOptions(options)
-        }
+    processor.parse('Hello *World*!')
+      .catch(exception => {
+        assert(exception.file === '')
+        assert(exception.line === 1)
+        assert(exception.column === 7)
+        assert(exception.reason === message)
+        assert(exception.toString() === '1:7: ' + message)
+        done()
+      })
+  })
 
-        return html.apply(this, arguments)
+  it('should warn when missing locators', function (done) {
+    var processor = remark()
+    var proto = processor.Parser.prototype
+    var methods = proto.inlineMethods
+    var file = new VFile('Hello *World*!')
+
+    /** Tokenizer. */
+    function noop () {}
+
+    proto.inlineTokenizers.foo = noop
+    methods.splice(methods.indexOf('inlineText'), 0, 'foo')
+
+    file.quiet = true
+    return processor.parse(file)
+      .then(() => {
+        assert.equal(String(file.messages[0]), '1:1: Missing locator: `foo`')
+        done()
+      })
+  })
+
+  it('should warn with entity messages', function () {
+    var filePath = path.join('test', 'input', 'entities-advanced.text')
+    var doc = fs.readFileSync(filePath, 'utf8')
+    var file = new VFile(doc)
+    var notTerminated = 'Named character references must be ' +
+        'terminated by a semicolon'
+
+    file.quiet = true
+
+    remark.process(file)
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:13: Named character references must be known',
+      '5:15: ' + notTerminated,
+      '10:14: ' + notTerminated,
+      '12:38: ' + notTerminated,
+      '15:16: ' + notTerminated,
+      '15:37: ' + notTerminated,
+      '14:16: ' + notTerminated,
+      '18:17: ' + notTerminated,
+      '19:21: ' + notTerminated,
+      '17:16: ' + notTerminated,
+      '24:16: ' + notTerminated,
+      '24:37: ' + notTerminated,
+      '22:11: ' + notTerminated,
+      '29:17: ' + notTerminated,
+      '30:21: ' + notTerminated,
+      '28:17: ' + notTerminated,
+      '33:11: ' + notTerminated,
+      '36:27: ' + notTerminated,
+      '37:10: ' + notTerminated,
+      '41:25: ' + notTerminated,
+      '42:10: ' + notTerminated
+    ])
+  })
+
+  it('should be able to set options', done => {
+    var processor = remark()
+    var html = processor.Parser.prototype.blockTokenizers.html
+
+    /**
+     * Set option when an HMTL comment occurs:
+     * `<!-- $key -->`, turns on `$key`.
+     *
+     * @param {function(string)} eat - Eater.
+     * @param {string} value - Rest of content.
+     */
+    function replacement (eat, value) {
+      var node = /<!--\s*(.*?)\s*-->/g.exec(value)
+      var options = {}
+
+      if (node) {
+        options[node[1]] = true
+
+        this.setOptions(options)
       }
 
-      processor.Parser.prototype.blockTokenizers.html = replacement
+      return html.apply(this, arguments)
+    }
 
-      processor
-        .parse([
-          '<!-- commonmark -->',
-          '',
-          '1)   Hello World',
-          ''
-        ].join('\n'))
-        .then(result => {
-          assert(result.children[1].type === 'list')
-          done()
-        })
-    })
-});
+    processor.Parser.prototype.blockTokenizers.html = replacement
+
+    processor
+      .parse([
+        '<!-- commonmark -->',
+        '',
+        '1)   Hello World',
+        ''
+      ].join('\n'))
+      .then(result => {
+        assert(result.children[1].type === 'list')
+        done()
+      })
+  })
+})
 
 describe('remark.stringify(ast, file, options?)', function () {
     it('should throw when `ast` is not an object', function () {
@@ -653,128 +653,138 @@ describe('remark.run(ast, file?, done?)', function () {
 });
 
 describe('remark.process(value, options, done)', function () {
-    it('should parse and stringify a file', function () {
-        assert(remark.process('*foo*') === '_foo_\n');
-    });
+  it('should parse and stringify a file', done => {
+    return remark.process('*foo*')
+      .then(res => {
+        assert(res.result === '_foo_\n')
+        done()
+      })
+  })
 
-    it('should accept parse options', function () {
-        assert(remark.process('1)  foo', {
-            'commonmark': true
-        }) === '1.  foo\n');
-    });
+  it('should accept parse options', done => {
+    return remark.process('1)  foo', { commonmark: true })
+      .then(res => {
+        assert(res.result === '1.  foo\n')
+        done()
+      })
+  })
 
-    it('should accept stringify options', function () {
-        assert(remark.process('# foo', {
-            'closeAtx': true
-        }) === '# foo #\n');
-    });
+  it('should accept stringify options', done => {
+    return remark.process('# foo', { closeAtx: true })
+      .then(res => {
+        assert(res.result === '# foo #\n')
+        done()
+      })
+  })
 
-    it('should run plugins', function () {
-        assert(
-            remark.use(mentions).process('@mention') ===
-            '[@mention](https://github.com/blog/821)\n'
-        );
-    });
+  it('should run plugins', done => {
+    return remark.use(mentions).process('@mention')
+      .then(res => {
+        assert(res.result === '[@mention](https://github.com/blog/821)\n')
+        done()
+      })
+  })
 
-    it('should run async plugins', function (done) {
-        remark.use(asyncAttacher).process('Foo', function (err) {
-            done(err);
-        });
-    });
+  it('should run async plugins', done => {
+    return remark.use(asyncAttacher).process('Foo')
+      .then(() => done)
+  })
 
-    it('should pass an async error', function (done) {
-        var exception = new Error('test');
+  it('should pass an async error', done => {
+    var exception = new Error('test')
 
-        /**
-         * Transformer.
-         *
-         * @param {Node} ast - Syntax-tree.
-         * @param {VFile} file - Virtual file.
-         * @param {Function} next - Callback invoked when done.
-         */
-        function transformer(ast, file, next) {
-            setTimeout(function () {
-                next(exception);
-            }, 4);
-        }
-
-        /**
-         * Attacher.
-         */
-        function attacher() {
-            return transformer;
-        }
-
-        remark.use(attacher).process('Foo', function (err) {
-            assert(err === exception);
-            done();
-        });
-    });
-
-    it('should throw an error', function () {
-        var exception = new Error('test');
-
-        /**
-         * Transformer.
-         */
-        function transformer() {
-            throw exception;
-        }
-
-        /**
-         * Attacher.
-         */
-        function attacher() {
-            return transformer;
-        }
-
-        try {
-            remark.use(attacher).process('Foo');
-        } catch (err) {
-            assert(err === exception);
-        }
-    });
-
-    it('should throw when `pedantic` is `true`, `listItemIndent` is not ' +
-        '`tab`, and compiling code in a list-item',
-        function () {
-            assert.throws(function () {
-                remark.process([
-                    '* List',
-                    '',
-                    '        code()'
-                ].join('\n'), {
-                    'pedantic': true,
-                    'listItemIndent': '1'
-                });
-            }, /Cannot indent code properly. See http:\/\/git.io\/vgFvT/);
-        }
-    );
-});
-
-describe.only('function attacher(remark, options)', function () {
-    /*
-     * Lot's of other tests are in
-     * `remark.use(plugin, options)`.
+    /**
+     * Transformer.
+     *
+     * @param {Node} ast - Syntax-tree.
+     * @param {VFile} file - Virtual file.
+     * @param {Function} next - Callback invoked when done.
      */
+    function transformer (ast, file, next) {
+      setTimeout(function () {
+        next(exception)
+      }, 4)
+    }
 
-    it('should be able to modify `Parser` without affecting other instances',
-        done => {
-            var doc = 'Hello w/ a @mention!\n';
+    /**
+     * Attacher.
+     */
+    function attacher () {
+      return transformer
+    }
 
-            return remark.use(mentions).process(doc)
-              .then(res => assert(res.result === 'Hello w/ a [@mention](https://github.com/blog/821)!\n'))
-              .then(() => remark.process(doc))
-              .then(res => assert(res.result === doc))
-              .then(() => done())
-        }
-    );
+    remark.use(attacher).process('Foo')
+      .catch(err => {
+        assert(err === exception)
+        done()
+      })
+  })
+
+  it('should throw an error', function () {
+    var exception = new Error('test')
+
+    /**
+     * Transformer.
+     */
+    function transformer () {
+      throw exception
+    }
+
+    /**
+     * Attacher.
+     */
+    function attacher () {
+      return transformer
+    }
+
+    try {
+      remark.use(attacher).process('Foo')
+    } catch (err) {
+      assert(err === exception)
+    }
+  })
+
+  it('should throw when `pedantic` is `true`, `listItemIndent` is not ' +
+      '`tab`, and compiling code in a list-item',
+      function () {
+          assert.throws(function () {
+              remark.process([
+                  '* List',
+                  '',
+                  '        code()'
+              ].join('\n'), {
+                  'pedantic': true,
+                  'listItemIndent': '1'
+              });
+          }, /Cannot indent code properly. See http:\/\/git.io\/vgFvT/);
+      }
+  );
 });
 
-describe('function transformer(ast, file, next?)', function () {
-    it('should be invoked when `run()` is invoked', function () {
-        var result = remark.parse('# Hello world');
-        var isInvoked;
+describe('function attacher(remark, options)', function () {
+  /*
+   * Lot's of other tests are in
+   * `remark.use(plugin, options)`.
+   */
+
+  it('should be able to modify `Parser` without affecting other instances',
+    done => {
+      var doc = 'Hello w/ a @mention!\n'
+
+      return remark.use(mentions).process(doc)
+        .then(res => assert(res.result === 'Hello w/ a [@mention](https://github.com/blog/821)!\n'))
+        .then(() => remark.process(doc))
+        .then(res => assert(res.result === doc))
+        .then(() => done())
+    }
+  )
+})
+
+describe('function transformer(ast, file, next?)', () => {
+  it('should be invoked when `run()` is invoked', done => {
+    return remark.parse('# Hello world')
+      .then(result => {
+        var isInvoked
 
         /**
          * Plugin.
@@ -782,96 +792,108 @@ describe('function transformer(ast, file, next?)', function () {
          * @param {Node} ast - Syntax-tree.
          * @param {VFile} file - Virtual file.
          */
-        function assertion(ast, file) {
-            assert.equal(ast, result);
-            assert('hasFailed' in file);
+        function assertion (ast, file) {
+          assert.equal(ast, result)
+          assert('hasFailed' in file)
 
-            isInvoked = true;
+          isInvoked = true
         }
 
         /**
          * Attacher.
          */
-        function attacher() {
-            return assertion;
+        function attacher () {
+          return assertion
         }
 
-        remark.use(attacher).run(result);
+        remark.use(attacher).run(result)
 
-        assert(isInvoked === true);
-    });
+        assert(isInvoked === true)
+        done()
+      })
+  })
 
-    it('should fail remark if an exception occurs', function () {
-        var exception = new Error('test');
-        var fixture = '# Hello world';
-        var ast = remark.parse(fixture);
-
+  it('should fail remark if an exception occurs', done => {
+    var exception = new Error('test')
+    var fixture = '# Hello world'
+    return remark.parse(fixture)
+      .then(ast => {
         /**
          * Thrower.
          */
-        function thrower() {
-            throw exception;
+        function thrower () {
+          throw exception
         }
 
         /**
          * Attacher.
          */
-        function attacher() {
-            return thrower;
+        function attacher () {
+          return thrower
         }
 
         assert.throws(function () {
-            remark.use(attacher).run(ast);
-        }, /test/);
-    });
+          remark.use(attacher).run(ast)
+        }, /test/)
 
-    it('should fail remark if an exception is returned', function () {
-        var exception = new Error('test');
-        var fixture = '# Hello world';
-        var ast = remark.parse(fixture);
+        done()
+      })
+  })
 
+  it('should fail remark if an exception is returned', done => {
+    var exception = new Error('test')
+    var fixture = '# Hello world'
+    return remark.parse(fixture)
+      .then(ast => {
         /**
          * Returner.
          */
-        function thrower() {
-            return exception;
+        function thrower () {
+          return exception
         }
 
         /**
          * Attacher.
          */
-        function attacher() {
-            return thrower;
+        function attacher () {
+          return thrower
         }
 
         assert.throws(function () {
-            remark.use(attacher).run(ast);
-        }, /test/);
-    });
+          remark.use(attacher).run(ast)
+        }, /test/)
 
-    it('should work on an example plugin', function () {
-        var source = remark.use(badges).process('# remark');
+        done()
+      })
+  })
 
+  it('should work on an example plugin', done => {
+    return remark.use(badges).process('# remark')
+      .then(source => {
         assert(
-            source ===
+            source.result ===
             '# remark [![Version](http://img.shields.io/npm/v/remark.svg)' +
             '](https://www.npmjs.com/package/remark)\n'
-        );
+        )
 
-        source = remark.use(badges, {
-            'flat': true
-        }).process('# remark');
-
+        return remark.use(badges, {
+          flat: true
+        }).process('# remark')
+      })
+      .then(source => {
         assert(
-            source ===
+            source.result ===
             '# remark [![Version](http://img.shields.io/npm/v/remark.svg' +
             '?style=flat)](https://www.npmjs.com/package/remark)\n'
-        );
-    });
-});
+        )
+        done()
+      })
+      .catch(done)
+  })
+})
 
-var validateToken;
-var validateTokens;
+var validateToken
+var validateTokens
 
 /**
  * Validate `children`.
@@ -879,8 +901,8 @@ var validateTokens;
  * @param {Array.<Object>} children - Nodes to validate.
  */
 validateTokens = function (children) {
-    children.forEach(validateToken);
-};
+  children.forEach(validateToken)
+}
 
 /**
  * Validate `context`.
@@ -888,10 +910,10 @@ validateTokens = function (children) {
  * @param {Object} context - Node to validate.
  */
 validateToken = function (context) {
-    var keys = Object.keys(context).length;
-    var type = context.type;
+    var keys = Object.keys(context).length
+    var type = context.type
 
-    assert('type' in context);
+    assert('type' in context)
 
     if ('children' in context) {
         assert(Array.isArray(context.children));
@@ -1012,7 +1034,7 @@ validateToken = function (context) {
     if (type === 'list') {
         assert('children' in context);
         assert(typeof context.ordered === 'boolean');
-        assert(typeof context.loose === 'boolean');
+        expect(context.loose).to.be.a('boolean')
         assert(keys === 5);
 
         if (context.ordered) {
@@ -1248,54 +1270,67 @@ function compare(node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-describe('fixtures', function () {
-    fixtures.forEach(function (fixture) {
-        describe(fixture.name, function () {
-            var input = fixture.input;
-            var possibilities = fixture.possibilities;
-            var mapping = fixture.mapping;
-            var trees = fixture.trees;
-            var output = fixture.output;
+// failing 0
+var runonly = 40
+describe.only('fixtures', function () {
+  fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
+    describe(fixture.name, function () {
+      var input = fixture.input
+      var possibilities = fixture.possibilities
+      var mapping = fixture.mapping
+      var trees = fixture.trees
+      var output = fixture.output
 
-            Object.keys(possibilities).forEach(function (key) {
-                var name = key || 'default';
-                var parse = possibilities[key];
-                var stringify = extend({}, fixture.stringify, {
-                    'gfm': parse.gfm,
-                    'commonmark': parse.commonmark,
-                    'pedantic': parse.pedantic
-                });
-                var initialClean = !parse.position;
-                var node;
-                var markdown;
+      Object.keys(possibilities).forEach(function (key) {
+        var name = key || 'default'
+        var parse = possibilities[key]
+        var stringify = extend({}, fixture.stringify, {
+          gfm: parse.gfm,
+          commonmark: parse.commonmark,
+          pedantic: parse.pedantic
+        })
+        var initialClean = !parse.position
+        var node
+        var markdown
 
-                it('should parse `' + name + '` correctly', function () {
-                    node = remark.parse(input, parse);
+        it('should parse `' + name + '` correctly', done => {
+          return remark.parse(input, parse)
+            .then(node_ => {
+              node = node_
 
-                    /*
-                     * The first assertion should not clean positional
-                     * information, except when `position: false`: in that
-                     * case the baseline should be stripped of positional
-                     * information.
-                     */
+              /*
+               * The first assertion should not clean positional
+               * information, except when `position: false`: in that
+               * case the baseline should be stripped of positional
+               * information.
+               */
 
-                    compare(node, trees[mapping[key]], false, initialClean);
+              compare(node, trees[mapping[key]], false, initialClean)
 
-                    markdown = remark.stringify(node, stringify);
-                });
+              markdown = remark.stringify(node, stringify)
 
-                if (output !== false) {
-                    it('should stringify `' + name + '`', function () {
-                        compare(node, remark.parse(markdown, parse), true);
-                    });
-                }
+              done()
+            })
+            .catch(done)
+        })
 
-                if (output === true) {
-                    it('should stringify `' + name + '` exact', function () {
-                        assert.equal(fixture.input, markdown);
-                    });
-                }
-            });
-        });
-    });
-});
+        if (output !== false) {
+          it('should stringify `' + name + '`', done => {
+            return remark.parse(markdown, parse)
+              .then(res => {
+                compare(node, res, true)
+                done()
+              })
+              .catch(done)
+          })
+        }
+
+        if (output === true) {
+          it('should stringify `' + name + '` exact', function () {
+            assert.equal(fixture.input, markdown)
+          })
+        }
+      })
+    })
+  })
+})
