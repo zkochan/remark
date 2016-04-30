@@ -191,7 +191,7 @@ describe('remark.parse(file, options?)', function () {
       })
   })
 
-  it('should warn with entity messages', function () {
+  it('should warn with entity messages', done => {
     var filePath = path.join('test', 'input', 'entities-advanced.text')
     var doc = fs.readFileSync(filePath, 'utf8')
     var file = new VFile(doc)
@@ -201,30 +201,33 @@ describe('remark.parse(file, options?)', function () {
     file.quiet = true
 
     remark.process(file)
-
-    assert.deepEqual(file.messages.map(String), [
-      '1:13: Named character references must be known',
-      '5:15: ' + notTerminated,
-      '10:14: ' + notTerminated,
-      '12:38: ' + notTerminated,
-      '15:16: ' + notTerminated,
-      '15:37: ' + notTerminated,
-      '14:16: ' + notTerminated,
-      '18:17: ' + notTerminated,
-      '19:21: ' + notTerminated,
-      '17:16: ' + notTerminated,
-      '24:16: ' + notTerminated,
-      '24:37: ' + notTerminated,
-      '22:11: ' + notTerminated,
-      '29:17: ' + notTerminated,
-      '30:21: ' + notTerminated,
-      '28:17: ' + notTerminated,
-      '33:11: ' + notTerminated,
-      '36:27: ' + notTerminated,
-      '37:10: ' + notTerminated,
-      '41:25: ' + notTerminated,
-      '42:10: ' + notTerminated
-    ])
+      .then(() => {
+        assert.deepEqual(file.messages.map(String), [
+          '1:13: Named character references must be known',
+          '5:15: ' + notTerminated,
+          '10:14: ' + notTerminated,
+          '12:38: ' + notTerminated,
+          '15:16: ' + notTerminated,
+          '15:37: ' + notTerminated,
+          '14:16: ' + notTerminated,
+          '18:17: ' + notTerminated,
+          '19:21: ' + notTerminated,
+          '17:16: ' + notTerminated,
+          '24:16: ' + notTerminated,
+          '24:37: ' + notTerminated,
+          '22:11: ' + notTerminated,
+          '29:17: ' + notTerminated,
+          '30:21: ' + notTerminated,
+          '28:17: ' + notTerminated,
+          '33:11: ' + notTerminated,
+          '36:27: ' + notTerminated,
+          '37:10: ' + notTerminated,
+          '41:25: ' + notTerminated,
+          '42:10: ' + notTerminated
+        ])
+        done()
+      })
+      .catch(done)
   })
 
   it('should be able to set options', done => {
@@ -268,236 +271,230 @@ describe('remark.parse(file, options?)', function () {
 })
 
 describe('remark.stringify(ast, file, options?)', function () {
-    it('should throw when `ast` is not an object', function () {
-        assert.throws(function () {
-            remark.stringify(false);
-        }, /false/);
-    });
+  it('should throw when `ast` is not an object', () => {
+    assert.throws(function () {
+      remark.stringify(false)
+    }, /false/)
+  })
 
-    it('should throw when `ast` is not a valid node', function () {
-        assert.throws(function () {
-            remark.stringify({
-                'type': 'unicorn'
-            });
-        }, /unicorn/);
-    });
+  it('should throw when `ast` is not a valid node', () => {
+    assert.throws(function () {
+      remark.stringify({
+        type: 'unicorn'
+      })
+    }, /unicorn/)
+  })
 
-    it('should not throw when given a parsed file', function () {
-        var file = new VFile('foo');
+  it('should not throw when given a parsed file', done => {
+    var file = new VFile('foo')
 
-        remark.parse(file);
-
+    remark.parse(file)
+      .then(() => {
         assert.doesNotThrow(function () {
-            remark.stringify(file);
-        });
-    });
+          remark.stringify(file)
+        })
+        done()
+      })
+      .catch(done)
+  })
 
-    it('should throw when `options` is not an object', function () {
-        assert.throws(function () {
-            remark.stringify(empty(), false);
-        }, /options/);
-    });
+  it('should throw when `options` is not an object', function () {
+    assert.throws(function () {
+      remark.stringify(empty(), false)
+    }, /options/)
+  })
 
-    it('should throw when `options.bullet` is not a valid list bullet',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'bullet': true
-                });
-            }, /options\.bullet/);
-        }
-    );
+  it('should throw when `options.bullet` is not a valid list bullet', function () {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        bullet: true
+      })
+    }, /options\.bullet/)
+  })
 
-    it('should throw when `options.listItemIndent` is not a valid ' +
-        'constant',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'listItemIndent': 'foo'
-                });
-            }, /options\.listItemIndent/);
-        }
-    );
+  it('should throw when `options.listItemIndent` is not a valid constant', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        listItemIndent: 'foo'
+      })
+    }, /options\.listItemIndent/)
+  })
 
-    it('should throw when `options.rule` is not a valid ' +
-        'horizontal rule bullet',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'rule': true
-                });
-            }, /options\.rule/);
-        }
-    );
+  it('should throw when `options.rule` is not a valid horizontal rule bullet', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        rule: true
+      })
+    }, /options\.rule/)
+  })
 
-    it('should throw when `options.ruleSpaces` is not a boolean',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'ruleSpaces': 1
-                });
-            }, /options\.ruleSpaces/);
-        }
-    );
+  it('should throw when `options.ruleSpaces` is not a boolean',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'ruleSpaces': 1
+              });
+          }, /options\.ruleSpaces/);
+      }
+  );
 
-    it('should throw when `options.ruleRepetition` is not a ' +
-        'valid repetition count',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'ruleRepetition': 1
-                });
-            }, /options\.ruleRepetition/);
+  it('should throw when `options.ruleRepetition` is not a ' +
+      'valid repetition count',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'ruleRepetition': 1
+              });
+          }, /options\.ruleRepetition/);
 
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'ruleRepetition': NaN
-                });
-            }, /options\.ruleRepetition/);
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'ruleRepetition': NaN
+              });
+          }, /options\.ruleRepetition/);
 
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'ruleRepetition': true
-                });
-            }, /options\.ruleRepetition/);
-        }
-    );
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'ruleRepetition': true
+              });
+          }, /options\.ruleRepetition/);
+      }
+  );
 
-    it('should throw when `options.emphasis` is not a ' +
-        'valid emphasis marker',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'emphasis': '-'
-                });
-            }, /options\.emphasis/);
-        }
-    );
+  it('should throw when `options.emphasis` is not a ' +
+      'valid emphasis marker',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'emphasis': '-'
+              });
+          }, /options\.emphasis/);
+      }
+  );
 
-    it('should throw when `options.strong` is not a ' +
-        'valid emphasis marker',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'strong': '-'
-                });
-            }, /options\.strong/);
-        }
-    );
+  it('should throw when `options.strong` is not a ' +
+      'valid emphasis marker',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'strong': '-'
+              });
+          }, /options\.strong/);
+      }
+  );
 
-    it('should throw when `options.setext` is not a boolean',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'setext': 0
-                });
-            }, /options\.setext/);
-        }
-    );
+  it('should throw when `options.setext` is not a boolean',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'setext': 0
+              });
+          }, /options\.setext/);
+      }
+  );
 
-    it('should throw when `options.incrementListMarker` is not a boolean',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'incrementListMarker': -1
-                });
-            }, /options\.incrementListMarker/);
-        }
-    );
+  it('should throw when `options.incrementListMarker` is not a boolean',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'incrementListMarker': -1
+              });
+          }, /options\.incrementListMarker/);
+      }
+  );
 
-    it('should throw when `options.fences` is not a boolean',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'fences': NaN
-                });
-            }, /options\.fences/);
-        }
-    );
+  it('should throw when `options.fences` is not a boolean', function () {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        fences: NaN
+      })
+    }, /options\.fences/)
+  })
 
-    it('should throw when `options.fence` is not a ' +
-        'valid fence marker',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'fence': '-'
-                });
-            }, /options\.fence/);
-        }
-    );
+  it('should throw when `options.fence` is not a ' +
+    'valid fence marker',
+    function () {
+      assert.throws(function () {
+        remark.stringify(empty(), {
+          'fence': '-'
+        })
+      }, /options\.fence/)
+    }
+  )
 
-    it('should throw when `options.closeAtx` is not a boolean', function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'closeAtx': NaN
-            });
-        }, /options\.closeAtx/);
-    });
+  it('should throw when `options.closeAtx` is not a boolean', function () {
+      assert.throws(function () {
+          remark.stringify(empty(), {
+              'closeAtx': NaN
+          });
+      }, /options\.closeAtx/);
+  });
 
-    it('should throw when `options.looseTable` is not a boolean',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'looseTable': 'Hello!'
-                });
-            }, /options\.looseTable/);
-        }
-    );
+  it('should throw when `options.looseTable` is not a boolean',
+      function () {
+          assert.throws(function () {
+              remark.stringify(empty(), {
+                  'looseTable': 'Hello!'
+              });
+          }, /options\.looseTable/);
+      }
+  );
 
-    it('should throw when `options.spacedTable` is not a boolean',
-        function () {
-            assert.throws(function () {
-                remark.stringify(empty(), {
-                    'spacedTable': 'World'
-                });
-            }, /options\.spacedTable/);
-        }
-    );
+  it('should throw when `options.spacedTable` is not a boolean', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        spacedTable: 'World'
+      })
+    }, /options\.spacedTable/)
+  })
 
-    it('should be able to set options', function () {
-        var processor = remark();
-        var html = processor.Compiler.prototype.visitors.html;
-        var ast;
+  it('should be able to set options', done => {
+    var processor = remark()
+    var html = processor.Compiler.prototype.visitors.html
 
-        ast = processor.parse([
-            '<!-- setext -->',
-            '',
-            '# Hello World',
-            ''
-        ].join('\n'));
+    processor.parse([
+      '<!-- setext -->',
+      '',
+      '# Hello World',
+      ''
+    ].join('\n'))
+    .then(ast => {
+      /**
+       * Set option when an HMTL comment occurs:
+       * `<!-- $key -->`, turns on `$key`.
+       *
+       * @param {Object} node - Node to compile.
+       * @return {string} - Compiled `node`.
+       */
+      function replacement (node) {
+        var value = node.value
+        var result = /<!--\s*(.*?)\s*-->/g.exec(value)
+        var options = {}
 
-        /**
-         * Set option when an HMTL comment occurs:
-         * `<!-- $key -->`, turns on `$key`.
-         *
-         * @param {Object} node - Node to compile.
-         * @return {string} - Compiled `node`.
-         */
-        function replacement(node) {
-            var value = node.value;
-            var result = /<!--\s*(.*?)\s*-->/g.exec(value);
-            var options = {};
+        if (result) {
+          options[result[1]] = true
 
-            if (result) {
-                options[result[1]] = true;
-
-                this.setOptions(options);
-            }
-
-            return html.apply(this, arguments);
+          this.setOptions(options)
         }
 
-        processor.Compiler.prototype.visitors.html = replacement;
+        return html.apply(this, arguments)
+      }
 
-        assert(processor.stringify(ast) === [
-            '<!-- setext -->',
-            '',
-            'Hello World',
-            '===========',
-            ''
-        ].join('\n'));
-    });
-});
+      processor.Compiler.prototype.visitors.html = replacement
+
+      assert(processor.stringify(ast) === [
+        '<!-- setext -->',
+        '',
+        'Hello World',
+        '===========',
+        ''
+      ].join('\n'))
+
+      done()
+    })
+    .catch(done)
+  })
+})
 
 describe('remark.use(plugin, options?)', function () {
     it('should accept an attacher', function () {
@@ -687,7 +684,8 @@ describe('remark.process(value, options, done)', function () {
 
   it('should run async plugins', done => {
     return remark.use(asyncAttacher).process('Foo')
-      .then(() => done)
+      .then(() => done())
+      .catch(done)
   })
 
   it('should pass an async error', done => {
@@ -744,22 +742,21 @@ describe('remark.process(value, options, done)', function () {
     }
   })
 
-  it('should throw when `pedantic` is `true`, `listItemIndent` is not ' +
-      '`tab`, and compiling code in a list-item',
-      function () {
-          assert.throws(function () {
-              remark.process([
-                  '* List',
-                  '',
-                  '        code()'
-              ].join('\n'), {
-                  'pedantic': true,
-                  'listItemIndent': '1'
-              });
-          }, /Cannot indent code properly. See http:\/\/git.io\/vgFvT/);
-      }
-  );
-});
+  it('should throw when `pedantic` is `true`, `listItemIndent` is not `tab`, and compiling code in a list-item', done => {
+    remark.process([
+      '* List',
+      '',
+      '        code()'
+    ].join('\n'), {
+      pedantic: true,
+      listItemIndent: '1'
+    })
+    .catch(err => {
+      expect(err.message).to.match(/Cannot indent code properly. See http:\/\/git.io\/vgFvT/)
+      done()
+    })
+  })
+})
 
 describe('function attacher(remark, options)', function () {
   /*
@@ -1270,7 +1267,7 @@ function compare (node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-describe.only('fixtures', function () {
+describe('fixtures', function () {
   let fixtureNo = 0
   fixtures.forEach(function (fixture) {
     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
