@@ -1270,12 +1270,9 @@ function compare (node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-// failing 30, 53, 55, 56, 57, 60, 61, 62, 63 ...
-// [80] 113, ... [150]
-var runonly = 29
-describe('fixtures', function () {
+describe.only('fixtures', function () {
   let fixtureNo = 0
-  fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
+  fixtures.forEach(function (fixture) {
     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
       var input = fixture.input
       var possibilities = fixture.possibilities
@@ -1307,87 +1304,7 @@ describe('fixtures', function () {
                * information.
                */
 
-               /*console.log(JSON.stringify(node, null, 1))
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-              console.log(JSON.stringify(trees[mapping[key]], null, 1))*/
               compare(node, trees[mapping[key]], false, initialClean)
-
-              markdown = remark.stringify(node, stringify)
-
-              done()
-            })
-            .catch(done)
-        })
-
-        if (output !== false) {
-          it('should stringify `' + name + '`', done => {
-            return remark.parse(markdown, parse)
-              .then(res => {
-                compare(node, res, true)
-                done()
-              })
-              .catch(done)
-          })
-        }
-
-        if (output === true) {
-          it('should stringify `' + name + '` exact', function () {
-            expect(markdown).to.eq(fixture.input)
-          })
-        }
-      })
-    })
-  })
-})
-
-const oldRemark = require('../../old-remark')
-// failing 30, 53, 55, 56, 57, 60, 61, 62, 63 ...
-// [80] 113, ... [150]
-var runonly = 29
-describe.only('fixtures1', function () {
-  let fixtureNo = 0
-  fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
-    describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
-      var input = fixture.input
-      var possibilities = fixture.possibilities
-      var mapping = fixture.mapping
-      var trees = fixture.trees
-      var output = fixture.output
-
-      Object.keys(possibilities).forEach(function (key) {
-        var name = key || 'default'
-        var parse = possibilities[key]
-        var stringify = extend({}, fixture.stringify, {
-          gfm: parse.gfm,
-          commonmark: parse.commonmark,
-          pedantic: parse.pedantic
-        })
-        var initialClean = !parse.position
-        var node
-        var markdown
-
-        it('should parse `' + name + '` correctly', done => {
-          return remark.parse(input, parse)
-            .then(node_ => {
-              node = node_
-
-              /*
-               * The first assertion should not clean positional
-               * information, except when `position: false`: in that
-               * case the baseline should be stripped of positional
-               * information.
-               */
-
-               /*console.log(JSON.stringify(node, null, 1))
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-               console.log('!!!!!!!!!!!!!!!!!!!!!!')
-              console.log(JSON.stringify(trees[mapping[key]], null, 1))*/
-              compare(node, oldRemark.parse(input, parse), false, initialClean)
 
               markdown = remark.stringify(node, stringify)
 
