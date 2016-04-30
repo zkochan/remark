@@ -1263,7 +1263,7 @@ function compare(node, baseline, clean, cleanBaseline) {
         cleanBaseline = true;
     }
 
-    assert.deepEqual(clone(node, clean), clone(baseline, cleanBaseline));
+    expect(clone(node, clean)).to.eql(clone(baseline, cleanBaseline));
 }
 
 /*
@@ -1272,10 +1272,10 @@ function compare(node, baseline, clean, cleanBaseline) {
 
 // failing 0, 41, 42, 43, 44, 45, 46, 53, 55, 56, 57, 60, 61, 62, 63 ...
 // [80] 113, ... [150]
-var runonly = 150
+var runonly = 0
 describe.only('fixtures', function () {
   let fixtureNo = 0
-  fixtures.slice(runonly, runonly + 10).forEach(function (fixture) {
+  fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
       var input = fixture.input
       var possibilities = fixture.possibilities
@@ -1307,6 +1307,11 @@ describe.only('fixtures', function () {
                * information.
                */
 
+              console.log(JSON.stringify(node, null, 2))
+              console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+              console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+              console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+              console.log(JSON.stringify(trees[mapping[key]], null, 2))
               compare(node, trees[mapping[key]], false, initialClean)
 
               markdown = remark.stringify(node, stringify)
