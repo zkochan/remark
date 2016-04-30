@@ -1272,10 +1272,11 @@ function compare(node, baseline, clean, cleanBaseline) {
 
 // failing 0, 41, 42, 43, 44, 45, 46, 53, 55, 56, 57, 60, 61, 62, 63 ...
 // [80] 113, ... [150]
-var runonly = 200
+var runonly = 10
 describe.only('fixtures', function () {
-  fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
-    describe(fixture.name, function () {
+  let fixtureNo = 0
+  fixtures.slice(runonly, runonly + 10).forEach(function (fixture) {
+    describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
       var input = fixture.input
       var possibilities = fixture.possibilities
       var mapping = fixture.mapping
@@ -1328,7 +1329,7 @@ describe.only('fixtures', function () {
 
         if (output === true) {
           it('should stringify `' + name + '` exact', function () {
-            assert.equal(fixture.input, markdown)
+            expect(markdown).to.eq(fixture.input)
           })
         }
       })
