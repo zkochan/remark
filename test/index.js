@@ -1272,7 +1272,7 @@ function compare(node, baseline, clean, cleanBaseline) {
 
 // failing 0, 41, 42, 43, 44, 45, 46, 53, 55, 56, 57, 60, 61, 62, 63 ...
 // [80] 113, ... [150]
-var runonly = 10
+var runonly = 150
 describe.only('fixtures', function () {
   let fixtureNo = 0
   fixtures.slice(runonly, runonly + 10).forEach(function (fixture) {
