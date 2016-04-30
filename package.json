@@ -1,6 +1,6 @@
 {
-  "name": "remark",
-  "version": "4.2.1",
+  "name": "@zkochan/remark",
+  "version": "0.1.0",
   "description": "Markdown processor powered by plugins",
   "license": "MIT",
   "keywords": [
@@ -17,6 +17,7 @@
     "cli"
   ],
   "dependencies": {
+    "@zkochan/unified": "^0.1.0",
     "camelcase": "^2.0.0",
     "ccount": "^1.0.0",
     "chalk": "^1.0.0",
@@ -41,7 +42,6 @@
     "to-vfile": "^1.0.0",
     "trim": "^0.0.1",
     "trim-trailing-lines": "^1.0.0",
-    "unified": "^3.0.0",
     "unist-util-remove-position": "^1.0.0",
     "user-home": "^2.0.0",
     "vfile": "^1.1.0",

@@ -3,7 +3,7 @@
  * @copyright 2015-2016 Titus Wormer
  * @license MIT
  * @module remark
- * @version 4.2.1
+ * @version 0.1.0
  * @fileoverview Markdown processor powered by plugins.
  */
 
@@ -15,7 +15,7 @@
  * Dependencies.
  */
 
-var unified = require('../unified');
+var unified = require('@zkochan/unified');
 var Parser = require('./lib/parse');
 var Compiler = require('./lib/stringify.js');
 var escape = require('./lib/escape.json');
