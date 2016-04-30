@@ -1176,22 +1176,22 @@ validateToken = function (context) {
  * @param {Array.<Object>} nodes - Nodes to merge.
  * @return {Array.<Object>} - Merged nodes.
  */
-function mergeTextNodes(nodes) {
-    if (!nodes.length || nodes[0].position) {
-        return nodes;
+function mergeTextNodes (nodes) {
+  if (!nodes.length || nodes[0].position) {
+    return nodes
+  }
+
+  var result = [nodes[0]]
+
+  nodes.slice(1).forEach(function (node) {
+    if (node.type === 'text' && result[result.length - 1].type === 'text') {
+      result[result.length - 1].value += node.value
+    } else {
+      result.push(node)
     }
+  })
 
-    var result = [nodes[0]];
-
-    nodes.slice(1).forEach(function (node) {
-        if (node.type == 'text' && result[result.length - 1].type == 'text') {
-            result[result.length - 1].value += node.value;
-        } else {
-            result.push(node);
-        }
-    });
-
-    return result;
+  return result
 }
 
 /**
@@ -1201,46 +1201,46 @@ function mergeTextNodes(nodes) {
  * @param {boolean} clean - Whether to clean.
  * @return {Object} - Cloned node.
  */
-function clone(node, clean) {
-    var result = Array.isArray(node) ? [] : {};
+function clone (node, clean) {
+  var result = Array.isArray(node) ? [] : {}
 
-    Object.keys(node).forEach(function (key) {
-        var value = node[key];
+  Object.keys(node).forEach(function (key) {
+    var value = node[key]
 
-        if (value === undefined) {
-            return;
-        }
+    if (value === undefined) {
+      return
+    }
 
-        /*
-         * Remove `position` when needed.
-         */
+    /*
+     * Remove `position` when needed.
+     */
 
-        if (clean && key === 'position') {
-            return;
-        }
+    if (clean && key === 'position') {
+      return
+    }
 
-        /*
-         * Ignore `checked` attributes set to `null`,
-         * which only exist in `gfm` on list-items
-         * without a checkbox.  This ensures less
-         * needed fixtures.
-         */
+    /*
+     * Ignore `checked` attributes set to `null`,
+     * which only exist in `gfm` on list-items
+     * without a checkbox.  This ensures less
+     * needed fixtures.
+     */
 
-        if (key === 'checked' && value === null) {
-            return;
-        }
+    if (key === 'checked' && value === null) {
+      return
+    }
 
-        if (value !== null && typeof value === 'object') {
-            result[key] = clone(value, clean);
-            if (key === 'children') {
-                result[key] = mergeTextNodes(result[key]);
-            }
-        } else {
-            result[key] = value;
-        }
-    });
+    if (value !== null && typeof value === 'object') {
+      result[key] = clone(value, clean)
+      if (key === 'children') {
+        result[key] = mergeTextNodes(result[key])
+      }
+    } else {
+      result[key] = value
+    }
+  })
 
-    return result;
+  return result
 }
 
 /*
@@ -1256,14 +1256,14 @@ function clone(node, clean) {
  * @param {boolean} cleanBaseline - Whether to clean
  *   `baseline`.
  */
-function compare(node, baseline, clean, cleanBaseline) {
-    validateToken(node);
+function compare (node, baseline, clean, cleanBaseline) {
+  validateToken(node)
 
-    if (clean && !cleanBaseline) {
-        cleanBaseline = true;
-    }
+  if (clean && !cleanBaseline) {
+    cleanBaseline = true
+  }
 
-    expect(clone(node, clean)).to.eql(clone(baseline, cleanBaseline));
+  expect(clone(node, clean)).to.eql(clone(baseline, cleanBaseline))
 }
 
 /*
@@ -1307,11 +1307,6 @@ describe.only('fixtures', function () {
                * information.
                */
 
-              console.log(JSON.stringify(node, null, 2))
-              console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-              console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-              console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-              console.log(JSON.stringify(trees[mapping[key]], null, 2))
               compare(node, trees[mapping[key]], false, initialClean)
 
               markdown = remark.stringify(node, stringify)
