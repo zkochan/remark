@@ -1270,9 +1270,9 @@ function compare (node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-// failing 0, 41, 42, 43, 44, 45, 46, 53, 55, 56, 57, 60, 61, 62, 63 ...
+// failing 30, 53, 55, 56, 57, 60, 61, 62, 63 ...
 // [80] 113, ... [150]
-var runonly = 0
+var runonly = 29
 describe.only('fixtures', function () {
   let fixtureNo = 0
   fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
@@ -1307,6 +1307,12 @@ describe.only('fixtures', function () {
                * information.
                */
 
+               /*console.log(JSON.stringify(node, null, 1))
+               console.log('!!!!!!!!!!!!!!!!!!!!!!')
+               console.log('!!!!!!!!!!!!!!!!!!!!!!')
+               console.log('!!!!!!!!!!!!!!!!!!!!!!')
+               console.log('!!!!!!!!!!!!!!!!!!!!!!')
+              console.log(JSON.stringify(trees[mapping[key]], null, 1))*/
               compare(node, trees[mapping[key]], false, initialClean)
 
               markdown = remark.stringify(node, stringify)
