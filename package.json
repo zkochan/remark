@@ -1,6 +1,6 @@
 {
   "name": "@zkochan/remark",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Markdown processor powered by plugins",
   "license": "MIT",
   "keywords": [
