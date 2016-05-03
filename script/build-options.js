@@ -51,12 +51,12 @@ sections = fs.readdirSync(BASE).filter(function (filepath) {
 
 sections = sections.map(function (filepath) {
   return {
-      'description': read(join(filepath, 'description.md'), 'utf8'),
-      'path': filepath,
-      'options': read(join(filepath, 'config.json'), 'utf8'),
-      'fixture': read(join(filepath, 'fixture.text'), 'utf8'),
-      'parseOnly': /parse/.test(filepath),
-    }
+    'description': read(join(filepath, 'description.md'), 'utf8'),
+    'path': filepath,
+    'options': read(join(filepath, 'config.json'), 'utf8'),
+    'fixture': read(join(filepath, 'fixture.text'), 'utf8'),
+    'parseOnly': /parse/.test(filepath),
+  }
 })
 
 /*
@@ -128,88 +128,87 @@ function renderSection (section) {
   var code
 
   root.children.push({
-      'type': 'heading',
-      'depth': 3,
-      'children': [{
-          'type': 'text',
-          'value': section.title,
-        }],
-    })
+    'type': 'heading',
+    'depth': 3,
+    'children': [{
+      'type': 'text',
+      'value': section.title,
+    }],
+  })
 
   root.children = root.children.concat(
-        remark.parse(section.description).children
-    )
+    remark.parse(section.description).children
+  )
 
   root.children.push({
-      'type': 'paragraph',
-      'children': [{
-          'type': 'text',
-          'value': 'The following document:',
-        }],
-    })
+    'type': 'paragraph',
+    'children': [{
+      'type': 'text',
+      'value': 'The following document:',
+    }],
+  })
 
   root.children.push({
-      'type': 'code',
-      'lang': 'markdown',
-      'value': section.fixture.trimRight(),
-    })
+    'type': 'code',
+    'lang': 'markdown',
+    'value': section.fixture.trimRight(),
+  })
 
   root.children.push({
-      'type': 'paragraph',
-      'children': [{
-          'type': 'text',
-          'value': 'And the below JavaScript:',
-        }],
-    })
+    'type': 'paragraph',
+    'children': [{
+      'type': 'text',
+      'value': 'And the below JavaScript:',
+    }],
+  })
 
   code = 'var ast = remark.parse(document'
 
   if (section.options.parse) {
-      code += ', ' +
-            JSON.stringify(section.options.parse, null, 2).trimRight()
-    }
+    code += ', ' + JSON.stringify(section.options.parse, null, 2).trimRight()
+  }
 
   code += ');'
 
   if (!section.parseOnly) {
-      code += '\n\nremark.stringify(ast'
+    code += '\n\nremark.stringify(ast'
 
-      if (section.options.stringify) {
-          code += ', ' +
-                JSON.stringify(section.options.stringify, null, 2)
-                .trimRight()
-        }
-
-      code += ');'
+    if (section.options.stringify) {
+      code += ', ' +
+        JSON.stringify(section.options.stringify, null, 2)
+        .trimRight()
     }
 
-  root.children.push({
-      'type': 'code',
-      'lang': 'javascript',
-      'value': code,
-    })
+    code += ');'
+  }
 
   root.children.push({
-      'type': 'paragraph',
-      'children': [{
-          'type': 'text',
-          'value': 'Yields:',
-        }],
-    })
+    'type': 'code',
+    'lang': 'javascript',
+    'value': code,
+  })
+
+  root.children.push({
+    'type': 'paragraph',
+    'children': [{
+      'type': 'text',
+      'value': 'Yields:',
+    }],
+  })
 
   if (section.parseOnly) {
-      root.children.push({
-          'type': 'code',
-          'lang': 'json',
-          'value': JSON.stringify(section.ast, 0, 2),
-        })
-    } else {
-      root.children.push({
-          'type': 'code',
-          'lang': 'markdown',
-          'value': section.output.trimRight(),
-        })
-    }
+    root.children.push({
+      'type': 'code',
+      'lang': 'json',
+      'value': JSON.stringify(section.ast, 0, 2),
+    })
+  } else {
+    root.children.push({
+      'type': 'code',
+      'lang': 'markdown',
+      'value': section.output.trimRight(),
+    })
+  }
 }
 
 /*
@@ -220,9 +219,9 @@ root.children.push({
   'type': 'heading',
   'depth': 2,
   'children': [{
-      'type': 'text',
-      'value': 'Parse',
-    }],
+    'type': 'text',
+    'value': 'Parse',
+  }],
 })
 
 /*
@@ -239,9 +238,9 @@ root.children.push({
   'type': 'heading',
   'depth': 2,
   'children': [{
-      'type': 'text',
-      'value': 'Stringify',
-    }],
+    'type': 'text',
+    'value': 'Stringify',
+  }],
 })
 
 /*

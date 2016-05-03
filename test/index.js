@@ -328,80 +328,61 @@ describe('remark.stringify(ast, file, options?)', function () {
     }, /options\.rule/)
   })
 
-  it('should throw when `options.ruleSpaces` is not a boolean',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'ruleSpaces': 1,
-              })
-          }, /options\.ruleSpaces/)
-      }
-  )
+  it('should throw when `options.ruleSpaces` is not a boolean', () => {
+    assert.throws(() => remark.stringify(empty(), { ruleSpaces: 1 }), /options\.ruleSpaces/)
+  })
 
-  it('should throw when `options.ruleRepetition` is not a ' +
-      'valid repetition count',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'ruleRepetition': 1,
-              })
-          }, /options\.ruleRepetition/)
+  it('should throw when `options.ruleRepetition` is not a valid repetition count', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'ruleRepetition': 1,
+      })
+    }, /options\.ruleRepetition/)
 
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'ruleRepetition': NaN,
-              })
-          }, /options\.ruleRepetition/)
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'ruleRepetition': NaN,
+      })
+    }, /options\.ruleRepetition/)
 
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'ruleRepetition': true,
-              })
-          }, /options\.ruleRepetition/)
-      }
-  )
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'ruleRepetition': true,
+      })
+    }, /options\.ruleRepetition/)
+  })
 
-  it('should throw when `options.emphasis` is not a ' +
-      'valid emphasis marker',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'emphasis': '-',
-              })
-          }, /options\.emphasis/)
-      }
-  )
+  it('should throw when `options.emphasis` is not a valid emphasis marker', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'emphasis': '-',
+      })
+    }, /options\.emphasis/)
+  })
 
-  it('should throw when `options.strong` is not a ' +
-      'valid emphasis marker',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'strong': '-',
-              })
-          }, /options\.strong/)
-      }
-  )
+  it('should throw when `options.strong` is not a valid emphasis marker', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'strong': '-',
+      })
+    }, /options\.strong/)
+  })
 
-  it('should throw when `options.setext` is not a boolean',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'setext': 0,
-              })
-          }, /options\.setext/)
-      }
-  )
+  it('should throw when `options.setext` is not a boolean', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'setext': 0,
+      })
+    }, /options\.setext/)
+  })
 
-  it('should throw when `options.incrementListMarker` is not a boolean',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'incrementListMarker': -1,
-              })
-          }, /options\.incrementListMarker/)
-      }
-  )
+  it('should throw when `options.incrementListMarker` is not a boolean', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'incrementListMarker': -1,
+      })
+    }, /options\.incrementListMarker/)
+  })
 
   it('should throw when `options.fences` is not a boolean', function () {
     assert.throws(function () {
@@ -422,23 +403,21 @@ describe('remark.stringify(ast, file, options?)', function () {
     }
   )
 
-  it('should throw when `options.closeAtx` is not a boolean', function () {
+  it('should throw when `options.closeAtx` is not a boolean', () => {
     assert.throws(function () {
-        remark.stringify(empty(), {
-            'closeAtx': NaN,
-          })
-      }, /options\.closeAtx/)
+      remark.stringify(empty(), {
+        'closeAtx': NaN,
+      })
+    }, /options\.closeAtx/)
   })
 
-  it('should throw when `options.looseTable` is not a boolean',
-      function () {
-        assert.throws(function () {
-            remark.stringify(empty(), {
-                'looseTable': 'Hello!',
-              })
-          }, /options\.looseTable/)
-      }
-  )
+  it('should throw when `options.looseTable` is not a boolean', () => {
+    assert.throws(function () {
+      remark.stringify(empty(), {
+        'looseTable': 'Hello!',
+      })
+    }, /options\.looseTable/)
+  })
 
   it('should throw when `options.spacedTable` is not a boolean', () => {
     assert.throws(function () {
@@ -498,155 +477,155 @@ describe('remark.stringify(ast, file, options?)', function () {
 
 describe('remark.use(plugin, options?)', function () {
   it('should accept an attacher', function () {
-      remark.use(noop)
-    })
+    remark.use(noop)
+  })
 
   it('should accept multiple attachers', function () {
-      remark.use([function () {}, function () {}])
-    })
+    remark.use([function () {}, function () {}])
+  })
 
   it('should attach multiple attachers in the correct order', function () {
-      var order = []
+    var order = []
 
-      remark.use([function () {
-          order.push(1)
-        }, function () {
-          order.push(2)
-        }])
+    remark.use([function () {
+      order.push(1)
+    }, function () {
+      order.push(2)
+    }])
 
-      assert.deepEqual(order, [1, 2])
-    })
+    assert.deepEqual(order, [1, 2])
+  })
 
   it('should return an instance of remark', function () {
-      var processor = remark.use(noop)
+    var processor = remark.use(noop)
 
-      assert(remark.use(noop) instanceof processor.constructor)
-    })
+    assert(remark.use(noop) instanceof processor.constructor)
+  })
 
   it('should attach an attacher', function () {
-      var processor = remark.use(noop)
+    var processor = remark.use(noop)
 
-      assert(processor.ware.attachers.length === 1)
-    })
+    assert(processor.ware.attachers.length === 1)
+  })
 
   it('should attach a transformer', function () {
-      var processor = remark.use(plugin)
+    var processor = remark.use(plugin)
 
-      assert(processor.ware.fns.length === 1)
-    })
+    assert(processor.ware.fns.length === 1)
+  })
 
   it('should attach multiple attachers', function () {
-      var processor = remark.use(function () {}).use(function () {})
+    var processor = remark.use(function () {}).use(function () {})
 
-      assert(processor.ware.attachers.length === 2)
-    })
+    assert(processor.ware.attachers.length === 2)
+  })
 
   it('should attach multiple transformers', function () {
-      var processor
+    var processor
 
-        /**
-         * Transformer.
-         */
-      processor = remark.use(function () {
-          return function () {}
-        }).use(function () {
-          return function () {}
-        })
-
-      assert(processor.ware.fns.length === 2)
+      /**
+       * Transformer.
+       */
+    processor = remark.use(function () {
+      return function () {}
+    }).use(function () {
+      return function () {}
     })
+
+    assert(processor.ware.fns.length === 2)
+  })
 
   it('should attach the same transformer multiple times', function () {
-      var processor
+    var processor
 
-        /**
-         * Transformer.
-         */
-      function transformer () {}
+      /**
+       * Transformer.
+       */
+    function transformer () {}
 
-      processor = remark.use(function () {
-          return transformer
-        }).use(function () {
-          return transformer
-        })
-
-      assert(processor.ware.fns.length === 2)
+    processor = remark.use(function () {
+      return transformer
+    }).use(function () {
+      return transformer
     })
+
+    assert(processor.ware.fns.length === 2)
+  })
 
   it('should invoke an attacher when `use()` is invoked', function () {
-      var options = {}
-      var isInvoked
+    var options = {}
+    var isInvoked
 
-        /**
-         * Attacher.
-         *
-         * @param {remark} processor - Processor.
-         * @param {Object} settings - Configuration.
-         */
-      function assertion (processor, settings) {
-          assert('use' in processor)
-          assert(settings === options)
+      /**
+       * Attacher.
+       *
+       * @param {remark} processor - Processor.
+       * @param {Object} settings - Configuration.
+       */
+    function assertion (processor, settings) {
+      assert('use' in processor)
+      assert(settings === options)
 
-          isInvoked = true
-        }
+      isInvoked = true
+    }
 
-      remark.use(assertion, options)
+    remark.use(assertion, options)
 
-      assert(isInvoked === true)
-    })
+    assert(isInvoked === true)
+  })
 
   it('should fail if an exception occurs in an attacher', function () {
-      var exception = new Error('test')
+    var exception = new Error('test')
 
-        /**
-         * Thrower.
-         */
-      function thrower () {
-          throw exception
-        }
+      /**
+       * Thrower.
+       */
+    function thrower () {
+      throw exception
+    }
 
-      assert.throws(function () {
-          remark.use(thrower)
-        }, /test/)
-    })
+    assert.throws(function () {
+      remark.use(thrower)
+    }, /test/)
+  })
 })
 
 describe('remark.run(ast, file?, done?)', function () {
   it('should accept an ast', function () {
-      remark.run(empty())
-    })
+    remark.run(empty())
+  })
 
   it('should throw when `ast` is not an AST', function () {
-      assert.throws(function () {
-          remark.run(false)
-        }, /false/)
-    })
+    assert.throws(function () {
+      remark.run(false)
+    }, /false/)
+  })
 
   it('should accept a `file`', function () {
-      remark.run(empty(), new VFile())
-    })
+    remark.run(empty(), new VFile())
+  })
 
   it('should return the given ast', function () {
-      var node = empty()
+    var node = empty()
 
-      assert(node === remark.run(node))
-    })
+    assert(node === remark.run(node))
+  })
 
   it('should accept a `done` callback, without file', function (done) {
-      remark.run(empty(), function (err) {
-          done(err)
-        })
+    remark.run(empty(), function (err) {
+      done(err)
     })
+  })
 
   it('should accept a `done` callback', function (done) {
-      remark.run(empty(), {
-          'filename': 'Untitled',
-          'extension': 'md',
-          'contents': '',
-        }, function (err) {
-          done(err)
-        })
+    remark.run(empty(), {
+      'filename': 'Untitled',
+      'extension': 'md',
+      'contents': '',
+    }, function (err) {
+      done(err)
     })
+  })
 })
 
 describe('remark.process(value, options, done)', function () {
@@ -913,248 +892,248 @@ validateToken = function (context) {
   assert('type' in context)
 
   if ('children' in context) {
-      assert(Array.isArray(context.children))
-      validateTokens(context.children)
-    }
+    assert(Array.isArray(context.children))
+    validateTokens(context.children)
+  }
 
     /*
      * Validate position.
      */
 
   if (context.position) {
-      assert('start' in context.position)
-      assert('end' in context.position)
+    assert('start' in context.position)
+    assert('end' in context.position)
 
-      assert('line' in context.position.start)
-      assert('column' in context.position.start)
+    assert('line' in context.position.start)
+    assert('column' in context.position.start)
 
-      assert('line' in context.position.end)
-      assert('column' in context.position.end)
-    }
+    assert('line' in context.position.end)
+    assert('column' in context.position.end)
+  }
 
   if ('position' in context) {
-      keys--
-    }
+    keys--
+  }
 
   if ('value' in context) {
-      assert(typeof context.value === 'string')
-    }
+    assert(typeof context.value === 'string')
+  }
 
   if (type === 'root') {
-      assert('children' in context)
+    assert('children' in context)
 
-      if (context.footnotes) {
-          Object.keys(context.footnotes).forEach(function (id) {
-              validateToken(context.footnotes[id])
-            })
-        }
-
-      return
+    if (context.footnotes) {
+      Object.keys(context.footnotes).forEach(function (id) {
+        validateToken(context.footnotes[id])
+      })
     }
+
+    return
+  }
 
   if (
-        type === 'paragraph' ||
-        type === 'blockquote' ||
-        type === 'tableRow' ||
-        type === 'tableCell' ||
-        type === 'strong' ||
-        type === 'emphasis' ||
-        type === 'delete'
-    ) {
-      assert(keys === 2)
-      assert('children' in context)
+      type === 'paragraph' ||
+      type === 'blockquote' ||
+      type === 'tableRow' ||
+      type === 'tableCell' ||
+      type === 'strong' ||
+      type === 'emphasis' ||
+      type === 'delete'
+  ) {
+    assert(keys === 2)
+    assert('children' in context)
 
-      return
-    }
+    return
+  }
 
   if (type === 'listItem') {
-      assert(keys === 3 || keys === 4)
-      assert('children' in context)
-      assert(typeof context.loose === 'boolean')
+    assert(keys === 3 || keys === 4)
+    assert('children' in context)
+    assert(typeof context.loose === 'boolean')
 
-      if (keys === 4) {
-          assert(
-                context.checked === true ||
-                context.checked === false ||
-                context.checked === null
-            )
-        }
-
-      return
+    if (keys === 4) {
+      assert(
+          context.checked === true ||
+          context.checked === false ||
+          context.checked === null
+      )
     }
+
+    return
+  }
 
   if (type === 'footnote') {
-      assert(keys === 2)
-      assert('children' in context)
+    assert(keys === 2)
+    assert('children' in context)
 
-      return
-    }
+    return
+  }
 
   if (type === 'heading') {
-      assert(keys === 3)
-      assert(context.depth > 0)
-      assert(context.depth <= 6)
-      assert('children' in context)
+    assert(keys === 3)
+    assert(context.depth > 0)
+    assert(context.depth <= 6)
+    assert('children' in context)
 
-      return
-    }
+    return
+  }
 
   if (
-        type === 'text' ||
-        type === 'inlineCode' ||
-        type === 'yaml'
-    ) {
-      assert(keys === 2)
-      assert('value' in context)
+      type === 'text' ||
+      type === 'inlineCode' ||
+      type === 'yaml'
+  ) {
+    assert(keys === 2)
+    assert('value' in context)
 
-      return
-    }
+    return
+  }
 
   if (type === 'code') {
-      assert(keys === 3)
-      assert('value' in context)
+    assert(keys === 3)
+    assert('value' in context)
 
-      assert(
-            context.lang === null ||
-            typeof context.lang === 'string'
-        )
+    assert(
+        context.lang === null ||
+        typeof context.lang === 'string'
+    )
 
-      return
-    }
+    return
+  }
 
   if (type === 'thematicBreak' || type === 'break') {
-      assert(keys === 1)
+    assert(keys === 1)
 
-      return
-    }
+    return
+  }
 
   if (type === 'list') {
-      assert('children' in context)
-      assert(typeof context.ordered === 'boolean')
-      expect(context.loose).to.be.a('boolean')
-      assert(keys === 5)
+    assert('children' in context)
+    assert(typeof context.ordered === 'boolean')
+    expect(context.loose).to.be.a('boolean')
+    assert(keys === 5)
 
-      if (context.ordered) {
-          assert(typeof context.start === 'number')
-          assert(context.start === context.start)
-        } else {
-          assert(context.start === null)
-        }
-
-      return
+    if (context.ordered) {
+      assert(typeof context.start === 'number')
+      assert(context.start === context.start)
+    } else {
+      assert(context.start === null)
     }
+
+    return
+  }
 
   if (type === 'footnoteDefinition') {
-      assert(keys === 3)
-      assert('children' in context)
-      assert(typeof context.identifier === 'string')
+    assert(keys === 3)
+    assert('children' in context)
+    assert(typeof context.identifier === 'string')
 
-      return
-    }
+    return
+  }
 
   if (type === 'definition') {
-      assert(typeof context.identifier === 'string')
+    assert(typeof context.identifier === 'string')
 
-      assert(
-            context.title === null ||
-            typeof context.title === 'string'
-        )
+    assert(
+      context.title === null ||
+      typeof context.title === 'string'
+    )
 
-      assert(typeof context.url === 'string')
-      assert(context.link === undefined)
+    assert(typeof context.url === 'string')
+    assert(context.link === undefined)
 
-      assert(keys === 4)
+    assert(keys === 4)
 
-      return
-    }
+    return
+  }
 
   if (type === 'link') {
-      assert('children' in context)
-      assert(
-            context.title === null ||
-            typeof context.title === 'string'
-        )
-      assert(typeof context.url === 'string')
-      assert(context.href === undefined)
-      assert(keys === 4)
+    assert('children' in context)
+    assert(
+      context.title === null ||
+      typeof context.title === 'string'
+    )
+    assert(typeof context.url === 'string')
+    assert(context.href === undefined)
+    assert(keys === 4)
 
-      return
-    }
+    return
+  }
 
   if (type === 'image') {
-      assert(
-            context.title === null ||
-            typeof context.title === 'string'
-        )
-      assert(
-            context.alt === null ||
-            typeof context.alt === 'string'
-        )
-      assert(typeof context.url === 'string')
-      assert(context.src === undefined)
-      assert(keys === 4)
+    assert(
+      context.title === null ||
+      typeof context.title === 'string'
+    )
+    assert(
+      context.alt === null ||
+      typeof context.alt === 'string'
+    )
+    assert(typeof context.url === 'string')
+    assert(context.src === undefined)
+    assert(keys === 4)
 
-      return
-    }
+    return
+  }
 
   if (type === 'linkReference') {
-      assert('children' in context)
-      assert(typeof context.identifier === 'string')
+    assert('children' in context)
+    assert(typeof context.identifier === 'string')
 
-      assert(
-            context.referenceType === 'shortcut' ||
-            context.referenceType === 'collapsed' ||
-            context.referenceType === 'full'
-        )
+    assert(
+      context.referenceType === 'shortcut' ||
+      context.referenceType === 'collapsed' ||
+      context.referenceType === 'full'
+    )
 
-      assert(keys === 4)
+    assert(keys === 4)
 
-      return
-    }
+    return
+  }
 
   if (type === 'imageReference') {
-      assert(typeof context.identifier === 'string')
+    assert(typeof context.identifier === 'string')
 
-      assert(
-            context.alt === null ||
-            typeof context.alt === 'string'
-        )
+    assert(
+      context.alt === null ||
+      typeof context.alt === 'string'
+    )
 
-      assert(
-            context.referenceType === 'shortcut' ||
-            context.referenceType === 'collapsed' ||
-            context.referenceType === 'full'
-        )
+    assert(
+      context.referenceType === 'shortcut' ||
+      context.referenceType === 'collapsed' ||
+      context.referenceType === 'full'
+    )
 
-      assert(keys === 4)
+    assert(keys === 4)
 
-      return
-    }
+    return
+  }
 
   if (type === 'footnoteReference') {
-      assert(typeof context.identifier === 'string')
-      assert(keys === 2)
+    assert(typeof context.identifier === 'string')
+    assert(keys === 2)
 
-      return
-    }
+    return
+  }
 
   if (type === 'table') {
-      assert(keys === 3)
-      assert('children' in context)
+    assert(keys === 3)
+    assert('children' in context)
 
-      assert(Array.isArray(context.align))
+    assert(Array.isArray(context.align))
 
-      context.align.forEach(function (align) {
-          assert(
-                align === null ||
-                align === 'left' ||
-                align === 'right' ||
-                align === 'center'
-            )
-        })
+    context.align.forEach(function (align) {
+      assert(
+        align === null ||
+        align === 'left' ||
+        align === 'right' ||
+        align === 'center'
+      )
+    })
 
-      return
-    }
+    return
+  }
 
     /* This is the last possible type. If more types are added, they
      * should be added before this block, or the type:html tests should

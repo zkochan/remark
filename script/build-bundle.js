@@ -42,32 +42,32 @@ browserify(path.join(__dirname, '..', 'index.js'), {
   console.log(chalk.green('✓') + ' wrote `remark.js`')
 
   ast = esprima.parse(buf, {
-      'loc': true,
-      'range': true,
-      'raw': true,
-      'comment': true,
-      'tolerant': true,
-    })
+    'loc': true,
+    'range': true,
+    'raw': true,
+    'comment': true,
+    'tolerant': true,
+  })
 
   comment = ast.comments[0].value
 
   var doc = escodegen.generate(esmangle.mangle(esmangle.optimize(ast, {
-      'destructive': true,
-      'directive': true,
-      'preserveCompletionValue': false,
-      'legacy': false,
-      'topLevelContext': null,
-      'inStrictCode': true,
-    })), {
-      'format': {
-          'renumber': true,
-          'hexadecimal': true,
-          'escapeless': true,
-          'compact': true,
-          'semicolons': false,
-          'parentheses': false,
-        },
-    })
+    'destructive': true,
+    'directive': true,
+    'preserveCompletionValue': false,
+    'legacy': false,
+    'topLevelContext': null,
+    'inStrictCode': true,
+  })), {
+    'format': {
+      'renumber': true,
+      'hexadecimal': true,
+      'escapeless': true,
+      'compact': true,
+      'semicolons': false,
+      'parentheses': false,
+    },
+  })
 
   write(absolute('remark.min.js'), '/*' + comment + '*/\n' + doc)
 

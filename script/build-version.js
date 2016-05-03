@@ -43,12 +43,12 @@ findDown.all('.js', 'lib', function (err, files) {
   files.push(toVFile('index.js'))
 
   files.forEach(function (file) {
-      write(
-            file.filePath(),
-            read(file.filePath(), 'utf8')
-                .replace(/^( \* @version ).+$/m, '$1' + VERSION)
-        )
-    })
+    write(
+      file.filePath(),
+      read(file.filePath(), 'utf8')
+        .replace(/^( \* @version ).+$/m, '$1' + VERSION)
+    )
+  })
 })
 
 /*
@@ -58,6 +58,6 @@ findDown.all('.js', 'lib', function (err, files) {
 var manrc = toVFile('.remarkrc-man')
 
 write(
-    manrc.filePath(),
-    read(manrc.filePath(), 'utf8').replace(/("version": ")[^"]+(")/m, '$1' + VERSION + '$2')
+  manrc.filePath(),
+  read(manrc.filePath(), 'utf8').replace(/("version": ")[^"]+(")/m, '$1' + VERSION + '$2')
 )

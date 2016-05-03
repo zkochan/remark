@@ -31,24 +31,24 @@ var simplify = require('retext-simplify')
  */
 
 var naturalLanguage = retext()
-    .use(equality)
-    .use(profanities)
-    .use(readability, {
-      'age': 20,
-    })
-    .use(simplify, {
-      'ignore': [
-          'option',
-          'plugin',
-          'interface',
-          'parameters',
-          'function',
-          'modify',
-          'component',
-          'render',
-          'validate',
-        ],
-    })
+  .use(equality)
+  .use(profanities)
+  .use(readability, {
+    'age': 20,
+  })
+  .use(simplify, {
+    'ignore': [
+      'option',
+      'plugin',
+      'interface',
+      'parameters',
+      'function',
+      'modify',
+      'component',
+      'render',
+      'validate',
+    ],
+  })
 
 /**
  * Attacher.

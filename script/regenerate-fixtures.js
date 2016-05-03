@@ -32,18 +32,18 @@ fixtures.forEach(function (fixture) {
   var mapping = fixture.mapping
 
   Object.keys(mapping).forEach(function (key) {
-      var filename = name + (key ? '.' + key : key) + '.json'
-      var result
+    var filename = name + (key ? '.' + key : key) + '.json'
+    var result
 
-      try {
-          result = remark.parse(input, fixture.possibilities[key])
-        } catch (err) {
-          console.log('Could not regenerate `' + filename + '`')
-          throw err
-        }
+    try {
+      result = remark.parse(input, fixture.possibilities[key])
+    } catch (err) {
+      console.log('Could not regenerate `' + filename + '`')
+      throw err
+    }
 
-      result = JSON.stringify(result, null, 2) + '\n'
+    result = JSON.stringify(result, null, 2) + '\n'
 
-      fs.writeFileSync(path.join('test/tree/', filename), result)
-    })
+    fs.writeFileSync(path.join('test/tree/', filename), result)
+  })
 })

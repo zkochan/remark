@@ -47,10 +47,10 @@ var sources = [keys.join('.')]
 
 keys.forEach(function (key) {
   sources = [].concat.apply(sources, sources.map(function (source) {
-      return source.split('.').map(function (subkey) {
-          return subkey === key ? 'no' + key : subkey
-        }).join('.')
-    }))
+    return source.split('.').map(function (subkey) {
+      return subkey === key ? 'no' + key : subkey
+    }).join('.')
+  }))
 })
 
 /**
@@ -62,23 +62,20 @@ keys.forEach(function (key) {
  */
 function augment (key, value) {
   if (!value) {
-      value = key.slice(0, 2) !== 'no'
+    value = key.slice(0, 2) !== 'no'
 
-      if (!value) {
-          key = key.slice(2)
-        }
+    if (!value) {
+      key = key.slice(2)
     }
+  }
 
   key = camelcase(key)
 
   if (augment.hasOwnProperty(key)) {
-      value = augment[key](value)
-    }
+    value = augment[key](value)
+  }
 
-  return {
-      'key': key,
-      'value': value,
-    }
+  return { key, value }
 }
 
 augment.ruleRepetition = Number
@@ -101,34 +98,34 @@ function parseOptions (name) {
   var value
 
   while (++index < length) {
-      part = parts[index].split('=')
-      augmented = augment(part[0], part.slice(1).join('='))
-      key = augmented.key
-      value = augmented.value
+    part = parts[index].split('=')
+    augmented = augment(part[0], part.slice(1).join('='))
+    key = augmented.key
+    value = augmented.value
 
-      if (key === 'output') {
-          options[key] = value
-        } else {
-          if (key in defaults.parse && value !== options.parse[key]) {
-              options.parse[key] = value
+    if (key === 'output') {
+      options[key] = value
+    } else {
+      if (key in defaults.parse && value !== options.parse[key]) {
+        options.parse[key] = value
 
-              results.push(parts[index])
-            }
+        results.push(parts[index])
+      }
 
-          if (
-                key in defaults.stringify &&
-                value !== options.stringify[key]
-            ) {
-              options.stringify[key] = value
+      if (
+          key in defaults.stringify &&
+          value !== options.stringify[key]
+      ) {
+        options.stringify[key] = value
 
-                // Protect common options from `parse` and `stringify` from
-                // appearing twice.
-              if (results.indexOf(parts[index]) < 0) {
-                  results.push(parts[index])
-                }
-            }
+          // Protect common options from `parse` and `stringify` from
+          // appearing twice.
+        if (results.indexOf(parts[index]) < 0) {
+          results.push(parts[index])
         }
+      }
     }
+  }
 
   options.source = results.join('.')
 
@@ -162,13 +159,13 @@ sources.forEach(function (source) {
      */
 
   if (
-        options.parse.breaks !== defaults.parse.breaks ||
-        options.parse.position !== defaults.parse.position
-    ) {
-      physical[source] = options.parse
-    } else {
-      virtual[source] = options.parse
-    }
+      options.parse.breaks !== defaults.parse.breaks ||
+      options.parse.position !== defaults.parse.position
+  ) {
+    physical[source] = options.parse
+  } else {
+    virtual[source] = options.parse
+  }
 
   all[source] = options.parse
 })
@@ -187,10 +184,10 @@ function difference (options, compare) {
   var count = 0
 
   Object.keys(options).forEach(function (key) {
-      if (options[key] !== compare[key]) {
-          count++
-        }
-    })
+    if (options[key] !== compare[key]) {
+      count++
+    }
+  })
 
   return count
 }
@@ -210,13 +207,13 @@ function resolveFixture (source, fixtures, options) {
   var offset
 
   Object.keys(fixtures).forEach(function (key) {
-      offset = difference(options[source], options[key])
+    offset = difference(options[source], options[key])
 
-      if (offset < minimum) {
-          minimum = offset
-          resolved = key
-        }
-    })
+    if (offset < minimum) {
+      minimum = offset
+      resolved = key
+    }
+  })
 
   return resolved
 }
@@ -233,8 +230,8 @@ function resolveFixtures (fixtures, options) {
   var resolved = {}
 
   Object.keys(options).forEach(function (source) {
-      resolved[source] = resolveFixture(source, fixtures, options)
-    })
+    resolved[source] = resolveFixture(source, fixtures, options)
+  })
 
   return resolved
 }
@@ -256,54 +253,54 @@ var tests = fs.readdirSync(join(__dirname, 'input'))
       var resolved
 
       Object.keys(all).forEach(function (source) {
-          var treename
-          var tree
+        var treename
+        var tree
 
-          treename = [
-              filename.join('.'),
-              source ? '.' + source : '',
-              '.json',
-            ].join('')
+        treename = [
+          filename.join('.'),
+          source ? '.' + source : '',
+          '.json',
+        ].join('')
 
-          tree = join(__dirname, 'tree', treename)
+        tree = join(__dirname, 'tree', treename)
 
-          if (exists(tree)) {
-              fixtures[source] = JSON.parse(read(tree, 'utf-8'))
+        if (exists(tree)) {
+          fixtures[source] = JSON.parse(read(tree, 'utf-8'))
 
-              possibilities[source] = all[source]
-            } else if (
-                TYPE === typeMap.true &&
-                source in virtual &&
-                !settings.output
-            ) {
-              possibilities[source] = all[source]
-            }
-        })
+          possibilities[source] = all[source]
+        } else if (
+            TYPE === typeMap.true &&
+            source in virtual &&
+            !settings.output
+        ) {
+          possibilities[source] = all[source]
+        }
+      })
 
       if (!Object.keys(fixtures).length) {
-          throw new Error('Missing fixture for `' + name + '`')
-        }
+        throw new Error('Missing fixture for `' + name + '`')
+      }
 
       resolved = resolveFixtures(fixtures, possibilities)
 
       if (settings.output) {
-          if (Object.keys(fixtures).length > 1) {
-              throw new Error(
-                    'Multiple fixtures for output `' + name + '`'
-                )
-            }
+        if (Object.keys(fixtures).length > 1) {
+          throw new Error(
+                'Multiple fixtures for output `' + name + '`'
+            )
         }
+      }
 
       return {
-          'input': input,
-          'possibilities': possibilities,
-          'mapping': resolved,
-          'trees': fixtures,
-          'stringify': settings.stringify,
-          'output': settings.output,
-          'size': stat(join(__dirname, 'input', filepath)).size,
-          'name': name,
-        }
+        'input': input,
+        'possibilities': possibilities,
+        'mapping': resolved,
+        'trees': fixtures,
+        'stringify': settings.stringify,
+        'output': settings.output,
+        'size': stat(join(__dirname, 'input', filepath)).size,
+        'name': name,
+      }
     }
 )
 

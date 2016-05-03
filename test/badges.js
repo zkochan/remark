@@ -20,9 +20,9 @@ function isHeading (node) {
  */
 function getValue (node) {
   return node &&
-        ('value' in node ? node.value :
-        ('alt' in node ? node.alt :
-        ('title' in node ? node.title : '')))
+    ('value' in node ? node.value
+    : ('alt' in node ? node.alt
+    : ('title' in node ? node.title : '')))
 }
 
 /**
