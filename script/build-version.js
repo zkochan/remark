@@ -6,7 +6,7 @@
  * @fileoverview Persist `package.json`s version to other places.
  */
 
-'use strict';
+'use strict'
 
 /* eslint-env node */
 
@@ -14,50 +14,50 @@
  * Dependencies.
  */
 
-var fs = require('fs');
-var bail = require('bail');
-var toVFile = require('to-vfile');
-var findDown = require('vfile-find-down');
-var pack = require('../package.json');
+var fs = require('fs')
+var bail = require('bail')
+var toVFile = require('to-vfile')
+var findDown = require('vfile-find-down')
+var pack = require('../package.json')
 
 /*
  * Methods.
  */
 
-var read = fs.readFileSync;
-var write = fs.writeFileSync;
+var read = fs.readFileSync
+var write = fs.writeFileSync
 
 /*
  * Constants.
  */
 
-var VERSION = pack.version;
+var VERSION = pack.version
 
 /*
  * Update library files.
  */
 
 findDown.all('.js', 'lib', function (err, files) {
-    bail(err);
+  bail(err)
 
-    files.push(toVFile('index.js'));
+  files.push(toVFile('index.js'))
 
-    files.forEach(function (file) {
-        write(
+  files.forEach(function (file) {
+      write(
             file.filePath(),
             read(file.filePath(), 'utf8')
                 .replace(/^( \* @version ).+$/m, '$1' + VERSION)
-        );
-    });
-});
+        )
+    })
+})
 
 /*
  * Update manifests.
  */
 
-var manrc = toVFile('.remarkrc-man');
+var manrc = toVFile('.remarkrc-man')
 
 write(
     manrc.filePath(),
     read(manrc.filePath(), 'utf8').replace(/("version": ")[^"]+(")/m, '$1' + VERSION + '$2')
-);
+)

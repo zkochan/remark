@@ -1,6 +1,7 @@
 {
-  "extends": "eslint:recommended",
+  "extends": "standard",
   "rules": {
-    "quotes": [2, "single"]
+    "comma-dangle": [2, "always-multiline"],
+    "arrow-parens": [2, "as-needed"]
   }
 }

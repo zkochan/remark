@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /* eslint-env node */
 
@@ -6,7 +6,7 @@
  * Cached method.
  */
 
-var has = Object.prototype.hasOwnProperty;
+var has = Object.prototype.hasOwnProperty
 
 /*
  * Map of overwrites for at-mentions.
@@ -15,9 +15,9 @@ var has = Object.prototype.hasOwnProperty;
  * To my knowledge, there are no other magical usernames.
  */
 
-var OVERWRITES = {};
+var OVERWRITES = {}
 
-OVERWRITES.mentions = OVERWRITES.mention = 'blog/821';
+OVERWRITES.mentions = OVERWRITES.mention = 'blog/821'
 
 /**
  * Find a possible mention.
@@ -29,8 +29,8 @@ OVERWRITES.mentions = OVERWRITES.mention = 'blog/821';
  * @param {number} fromIndex - Index to start searching at.
  * @return {number} - Location of possible mention sequence.
  */
-function locateMention(value, fromIndex) {
-    return value.indexOf('@', fromIndex);
+function locateMention (value, fromIndex) {
+  return value.indexOf('@', fromIndex)
 }
 
 /**
@@ -52,54 +52,54 @@ function locateMention(value, fromIndex) {
  * @param {boolean?} [silent] - Whether this is a dry run.
  * @return {Node?|boolean} - `delete` node.
  */
-function mention(eat, value, silent) {
-    var match = /^@(\w+)/.exec(value);
-    var handle;
-    var url;
+function mention (eat, value, silent) {
+  var match = /^@(\w+)/.exec(value)
+  var handle
+  var url
 
-    if (match) {
-        if (silent) {
-            return true;
+  if (match) {
+      if (silent) {
+          return true
         }
 
-        handle = match[1];
-        url = 'https://github.com/';
-        url += has.call(OVERWRITES, handle) ? OVERWRITES[handle] : handle;
+      handle = match[1]
+      url = 'https://github.com/'
+      url += has.call(OVERWRITES, handle) ? OVERWRITES[handle] : handle
 
-        return eat(match[0])({
-            'type': 'link',
-            'url': url,
-            'children': [{
-                'type': 'text',
-                'value': match[0]
-            }]
-        });
+      return eat(match[0])({
+          'type': 'link',
+          'url': url,
+          'children': [{
+              'type': 'text',
+              'value': match[0],
+            }],
+        })
     }
 }
 
-mention.notInLink = true;
-mention.locator = locateMention;
+mention.notInLink = true
+mention.locator = locateMention
 
 /**
  * Attacher.
  *
  * @param {Remark} remark - Processor.
  */
-function attacher(remark) {
-    var proto = remark.Parser.prototype;
-    var methods = proto.inlineMethods;
+function attacher (remark) {
+  var proto = remark.Parser.prototype
+  var methods = proto.inlineMethods
 
     /*
      * Add a tokenizer to the `Parser`.
      */
 
-    proto.inlineTokenizers.mention = mention;
+  proto.inlineTokenizers.mention = mention
 
-    methods.splice(methods.indexOf('inlineText'), 0, 'mention');
+  methods.splice(methods.indexOf('inlineText'), 0, 'mention')
 }
 
 /*
  * Expose.
  */
 
-module.exports = attacher;
+module.exports = attacher

@@ -7,7 +7,7 @@
  * @fileoverview Markdown processor powered by plugins.
  */
 
-'use strict';
+'use strict'
 
 /* eslint-env commonjs */
 
@@ -15,20 +15,20 @@
  * Dependencies.
  */
 
-var unified = require('@zkochan/unified');
-var Parser = require('./lib/parse');
-var Compiler = require('./lib/stringify.js');
-var escape = require('./lib/escape.json');
+var unified = require('@zkochan/unified')
+var Parser = require('./lib/parse')
+var Compiler = require('./lib/stringify.js')
+var escape = require('./lib/escape.json')
 
 /*
  * Exports.
  */
 
 module.exports = unified({
-    'name': 'mdast',
-    'Parser': Parser,
-    'Compiler': Compiler,
-    'data': {
-        'escape': escape
-    }
-});
+  'name': 'mdast',
+  'Parser': Parser,
+  'Compiler': Compiler,
+  'data': {
+      'escape': escape,
+    },
+})

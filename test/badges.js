@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /* eslint-env node */
 
@@ -8,8 +8,8 @@
  * @param {Node} node - Node to check.
  * @return {boolean} - Whether `node` is the main heading.
  */
-function isHeading(node) {
-    return node && node.type === 'heading' && node.depth === 1;
+function isHeading (node) {
+  return node && node.type === 'heading' && node.depth === 1
 }
 
 /**
@@ -18,11 +18,11 @@ function isHeading(node) {
  * @param {Node} node - Node whose value to access.
  * @return {string} - Textual representation of `node`.
  */
-function getValue(node) {
-    return node &&
+function getValue (node) {
+  return node &&
         ('value' in node ? node.value :
         ('alt' in node ? node.alt :
-        ('title' in node ? node.title : '')));
+        ('title' in node ? node.title : '')))
 }
 
 /**
@@ -31,8 +31,8 @@ function getValue(node) {
  * @param {Node} node - Node to check.
  * @return {boolean} - Whether `node` has children.
  */
-function hasChildren(node) {
-    return node && 'children' in node;
+function hasChildren (node) {
+  return node && 'children' in node
 }
 
 /**
@@ -41,29 +41,29 @@ function hasChildren(node) {
  * @param {Node} node - Node to search.
  * @return {Node?} - Heading node.
  */
-function search(node) {
-    var index;
-    var length;
-    var result;
+function search (node) {
+  var index
+  var length
+  var result
 
-    if (isHeading(node)) {
-        return node;
+  if (isHeading(node)) {
+    return node
+  }
+
+  if (hasChildren(node)) {
+    index = -1
+    length = node.children.length
+
+    while (++index < length) {
+      result = search(node.children[index])
+
+      if (result) {
+        return result
+      }
     }
+  }
 
-    if (hasChildren(node)) {
-        index = -1;
-        length = node.children.length;
-
-        while (++index < length) {
-            result = search(node.children[index]);
-
-            if (result) {
-                return result;
-            }
-        }
-    }
-
-    return null;
+  return null
 }
 
 /**
@@ -74,8 +74,8 @@ function search(node) {
  * @param {Node} node - Node to stringify.
  * @return {string} - Textual representation of `node`.
  */
-function toString(node) {
-    return getValue(node) || node.children.map(toString).join('') || '';
+function toString (node) {
+  return getValue(node) || node.children.map(toString).join('') || ''
 }
 
 /**
@@ -88,33 +88,33 @@ function toString(node) {
  *   flat badge.
  * @return {Array.<Node>} - Nodes.
  */
-function createBadge(name, options) {
-    var href = 'https://www.npmjs.com/package/' + name;
-    var src = 'http://img.shields.io/npm/v/' + name + '.svg';
+function createBadge (name, options) {
+  var href = 'https://www.npmjs.com/package/' + name
+  var src = 'http://img.shields.io/npm/v/' + name + '.svg'
 
-    if (options && options.flat) {
-        src += '?style=flat';
-    }
+  if (options && options.flat) {
+    src += '?style=flat'
+  }
 
-    return [
+  return [
+    {
+      'type': 'text',
+      'value': ' ',
+    },
+    {
+      'type': 'link',
+      'title': null,
+      'url': href,
+      'children': [
         {
-            'type': 'text',
-            'value': ' '
+          'type': 'image',
+          'title': null,
+          'url': src,
+          'alt': 'Version',
         },
-        {
-            'type': 'link',
-            'title': null,
-            'url': href,
-            'children': [
-                {
-                    'type': 'image',
-                    'title': null,
-                    'url': src,
-                    'alt': 'Version'
-                }
-            ]
-        }
-    ];
+      ],
+    },
+  ]
 }
 
 /**
@@ -124,26 +124,26 @@ function createBadge(name, options) {
  * @param {Object} options - Configuration.
  * @return {Function} - Transformer.
  */
-function attach(remark, options) {
+function attach (remark, options) {
     /**
      * Adds an npm version badge to the main heading,
      * when available.
      *
      * @param {Node} node - AST.
      */
-    return function (node) {
-        var head = search(node);
+  return function (node) {
+    var head = search(node)
 
-        if (head) {
-            head.children = head.children.concat(
+    if (head) {
+      head.children = head.children.concat(
                 createBadge(toString(head), options)
-            );
-        }
-    };
+            )
+    }
+  }
 }
 
 /*
  * Expose `attach`.
  */
 
-module.exports = attach;
+module.exports = attach

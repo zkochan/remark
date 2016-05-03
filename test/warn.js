@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /* eslint-env node */
 
@@ -8,19 +8,19 @@
  * @param {Node} node - Syntax-tree.
  * @param {VFile} file - Virtual file.
  */
-function transformer(node, file) {
-    file.warn('Warning');
+function transformer (node, file) {
+  file.warn('Warning')
 }
 
 /**
  * Attacher.
  */
-function attacher() {
-    return transformer;
+function attacher () {
+  return transformer
 }
 
 /*
  * Expose.
  */
 
-module.exports = attacher;
+module.exports = attacher
