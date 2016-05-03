@@ -15,8 +15,8 @@
  * Dependencies.
  */
 
-var unified = require('@zkochan/unified')
-var Parser = require('./lib/parse')
+var unified = require('../unified')
+var parserFactory = require('./lib/parse')
 var Compiler = require('./lib/stringify')
 var escape = require('./lib/escape.json')
 
@@ -25,10 +25,10 @@ var escape = require('./lib/escape.json')
  */
 
 module.exports = unified({
-  'name': 'mdast',
-  'Parser': Parser,
-  'Compiler': Compiler,
-  'data': {
-      'escape': escape,
-    },
+  name: 'mdast',
+  parserFactory,
+  Compiler,
+  data: {
+    escape,
+  },
 })
