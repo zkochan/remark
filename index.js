@@ -17,7 +17,7 @@
 
 var unified = require('@zkochan/unified')
 var Parser = require('./lib/parse')
-var Compiler = require('./lib/stringify.js')
+var Compiler = require('./lib/stringify')
 var escape = require('./lib/escape.json')
 
 /*
