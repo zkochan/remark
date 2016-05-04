@@ -153,7 +153,7 @@ describe('remark.parse(file, options?)', function () {
      * @param {number} fromIndex - Index to start searching at.
      * @return {number} - Location of possible auto-link.
      */
-    function locator (value, fromIndex) {
+    function locator (parser, value, fromIndex) {
       return value.indexOf('*', fromIndex)
     }
 
@@ -1245,7 +1245,7 @@ function compare (node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-describe('fixtures', function () {
+describe.only('fixtures', function () {
   let fixtureNo = 0
   fixtures.forEach(function (fixture) {
     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
