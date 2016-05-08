@@ -1312,10 +1312,10 @@ describe.only('fixtures', function () {
 // const oldRemark = require('../../old-remark')
 // // failing 30, 53, 55, 56, 57, 60, 61, 62, 63 ...
 // // [80] 113, ... [150]
-// var runonly = 34
+// var runonly = 144
 // describe.only('fixtures1', function () {
 //   let fixtureNo = 0
-//   fixtures.slice(runonly, runonly + 1).forEach(function (fixture) {
+//   fixtures/*.slice(runonly, runonly + 1)*/.forEach(function (fixture) {
 //     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
 //       var input = fixture.input
 //       var possibilities = fixture.possibilities
