@@ -112,11 +112,10 @@
   "scripts": {
     "build-man": "bin/remark doc/*.?.md --config-path .remarkrc-man --quiet",
     "build-md": "bin/remark . --quiet --frail",
-    "build-version": "node script/build-version.js",
     "build-options": "node script/build-options.js",
     "build-bundle": "node script/build-bundle.js",
     "lint": "eslint .",
-    "build": "npm run build-version && npm run build-md && npm run build-options && npm run build-man && npm run build-bundle",
+    "build": "npm run build-md && npm run build-options && npm run build-man && npm run build-bundle",
     "test-api": "mocha --check-leaks test/index.js",
     "test-api-extensive": "TEST_EXTENDED=true npm run test-api",
     "test-cli": "bash test/cli.sh",
