@@ -29,6 +29,7 @@ module.exports = unified({
   parserFactory,
   blockTokenizers: require('./lib/parse/block-tokenizers'),
   inlineTokenizers: require('./lib/parse/inline-tokenizers'),
+  visitors: require('./lib/stringify/visitors'),
   Compiler,
   data: {
     escape,

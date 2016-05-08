@@ -439,7 +439,7 @@ describe('remark.stringify(ast, file, options?)', function () {
 
   it('should be able to set options', done => {
     var processor = remark()
-    var html = processor.Compiler.prototype.visitors.html
+    var html = processor.visitors.html
 
     processor.parse([
       '<!-- setext -->',
@@ -455,7 +455,7 @@ describe('remark.stringify(ast, file, options?)', function () {
        * @param {Object} node - Node to compile.
        * @return {string} - Compiled `node`.
        */
-      function replacement (node) {
+      function replacement (compiler, node) {
         var value = node.value
         var result = /<!--\s*(.*?)\s*-->/g.exec(value)
         var options = {}
@@ -463,13 +463,13 @@ describe('remark.stringify(ast, file, options?)', function () {
         if (result) {
           options[result[1]] = true
 
-          this.setOptions(options)
+          compiler.setOptions(options)
         }
 
-        return html.apply(this, arguments)
+        return html.apply(null, arguments)
       }
 
-      processor.Compiler.prototype.visitors.html = replacement
+      processor.visitors.html = replacement
 
       assert(processor.stringify(ast) === [
         '<!-- setext -->',
@@ -1260,7 +1260,7 @@ function compare (node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-describe.skip('fixtures', function () {
+describe('fixtures', function () {
   let fixtureNo = 0
   fixtures.forEach(function (fixture) {
     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {
