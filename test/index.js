@@ -158,7 +158,11 @@ describe('remark.parse(file, options?)', function () {
     }
 
     emphasis.locator = locator
-    processor.Parser.prototype.inlineTokenizers.emphasis = emphasis
+    const emphasisIndex = processor.inlineTokenizers.findIndex(t => t.name === 'emphasis')
+    processor.inlineTokenizers.splice(emphasisIndex, 1, {
+      name: 'emphasis',
+      func: emphasis,
+    })
 
     processor.parse('Hello *World*!')
       .catch(exception => {
@@ -173,15 +177,17 @@ describe('remark.parse(file, options?)', function () {
 
   it('should warn when missing locators', function (done) {
     var processor = remark()
-    var proto = processor.Parser.prototype
-    var methods = proto.inlineMethods
     var file = new VFile('Hello *World*!')
 
     /** Tokenizer. */
     function noop () {}
 
-    proto.inlineTokenizers.foo = noop
-    methods.splice(methods.indexOf('inlineText'), 0, 'foo')
+    processor.inlineTokenizers = processor.inlineTokenizers.slice()
+
+    processor.inlineTokenizers.splice(processor.inlineTokenizers.length - 1, 0, {
+      name: 'foo',
+      func: noop,
+    })
 
     file.quiet = true
     return processor.parse(file)
@@ -231,29 +237,33 @@ describe('remark.parse(file, options?)', function () {
 
   it('should be able to set options', done => {
     var processor = remark()
-    var html = processor.Parser.prototype.blockTokenizers.html
+    var htmlIndex = processor.blockTokenizers.findIndex(t => t.name === 'html')
+    const originalTokenizer = processor.blockTokenizers[htmlIndex]
 
     /**
-     * Set option when an HMTL comment occurs:
+     * Set option when an HTML comment occurs:
      * `<!-- $key -->`, turns on `$key`.
      *
      * @param {function(string)} eat - Eater.
      * @param {string} value - Rest of content.
      */
-    function replacement (eat, value) {
+    function replacement (parser, value) {
       var node = /<!--\s*(.*?)\s*-->/g.exec(value)
       var options = {}
 
       if (node) {
         options[node[1]] = true
 
-        this.setOptions(options)
+        parser.setOptions(options)
       }
 
-      return html.apply(this, arguments)
+      return originalTokenizer.func.apply(null, arguments)
     }
 
-    processor.Parser.prototype.blockTokenizers.html = replacement
+    var newTokenizer = Object.assign({}, originalTokenizer, { func: replacement })
+
+    processor.blockTokenizers = processor.blockTokenizers.slice()
+    processor.blockTokenizers.splice(htmlIndex, 1, newTokenizer)
 
     processor
       .parse([
@@ -266,6 +276,7 @@ describe('remark.parse(file, options?)', function () {
         assert(result.children[1].type === 'list')
         done()
       })
+      .catch(done)
   })
 })
 
@@ -658,6 +669,7 @@ describe('remark.process(value, options, done)', function () {
         assert(res.result === '[@mention](https://github.com/blog/821)\n')
         done()
       })
+      .catch(done)
   })
 
   it('should run async plugins', done => {
@@ -1245,7 +1257,7 @@ function compare (node, baseline, clean, cleanBaseline) {
  * Fixtures.
  */
 
-describe.only('fixtures', function () {
+describe('fixtures', function () {
   let fixtureNo = 0
   fixtures.forEach(function (fixture) {
     describe(`fixture #${++fixtureNo}, ${fixture.name}`, function () {

@@ -29,7 +29,7 @@ OVERWRITES.mentions = OVERWRITES.mention = 'blog/821'
  * @param {number} fromIndex - Index to start searching at.
  * @return {number} - Location of possible mention sequence.
  */
-function locateMention (value, fromIndex) {
+function locateMention (parser, value, fromIndex) {
   return value.indexOf('@', fromIndex)
 }
 
@@ -52,7 +52,7 @@ function locateMention (value, fromIndex) {
  * @param {boolean?} [silent] - Whether this is a dry run.
  * @return {Node?|boolean} - `delete` node.
  */
-function mention (eat, value, silent) {
+function mention (parser, value, silent) {
   var match = /^@(\w+)/.exec(value)
   var handle
   var url
@@ -66,7 +66,7 @@ function mention (eat, value, silent) {
     url = 'https://github.com/'
     url += has.call(OVERWRITES, handle) ? OVERWRITES[handle] : handle
 
-    return eat(match[0])({
+    return parser.eat(match[0])({
       'type': 'link',
       'url': url,
       'children': [{
@@ -86,16 +86,11 @@ mention.locator = locateMention
  * @param {Remark} remark - Processor.
  */
 function attacher (remark) {
-  var proto = remark.Parser.prototype
-  var methods = proto.inlineMethods
-
-    /*
-     * Add a tokenizer to the `Parser`.
-     */
-
-  proto.inlineTokenizers.mention = mention
-
-  methods.splice(methods.indexOf('inlineText'), 0, 'mention')
+  const inlineTextIndex = remark.inlineTokenizers.findIndex(t => t.name === 'inlineText')
+  remark.inlineTokenizers.splice(inlineTextIndex, 0, {
+    name: 'mention',
+    func: mention,
+  })
 }
 
 /*

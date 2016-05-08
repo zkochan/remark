@@ -27,6 +27,8 @@ var escape = require('./lib/escape.json')
 module.exports = unified({
   name: 'mdast',
   parserFactory,
+  blockTokenizers: require('./lib/parse/block-tokenizers'),
+  inlineTokenizers: require('./lib/parse/inline-tokenizers'),
   Compiler,
   data: {
     escape,
