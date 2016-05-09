@@ -1,12 +1,3 @@
-/**
- * @author Titus Wormer
- * @copyright 2015-2016 Titus Wormer
- * @license MIT
- * @module remark
- * @version 0.1.0
- * @fileoverview Markdown processor powered by plugins.
- */
-
 'use strict'
 
 /* eslint-env commonjs */
